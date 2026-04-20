@@ -1,0 +1,107 @@
+# El Mar dins Meu — TODO
+
+## Funcionalitats completades
+- [x] Catàleg de productes (4 samarretes: noi, noia, tirants, infantil)
+- [x] Cistella de compra amb drawer lateral
+- [x] Botó "Continuar comprant" a la cistella
+- [x] Checkout modal amb formulari de comanda
+- [x] Comandes enviades per correu (via notifyOwner) en lloc de WhatsApp
+- [x] Secció del llibre amb carrusel de 14 fotos
+- [x] Imatge duplicada del títol del llibre eliminada
+- [x] Secció del projecte "L'eco del silenci"
+- [x] Secció d'associacions (LaLo i Àngel Blau)
+- [x] Formulari de contacte integrat a la pàgina principal
+- [x] Resposta automàtica al formulari de contacte
+- [x] Guia de talles desplegable
+- [x] Sistema de ressenyes dinàmic (formulari públic + moderació)
+- [x] Panell d'administració de ressenyes (/admin/ressenyes)
+- [x] Base de dades per a ressenyes (Prisma/MySQL)
+- [x] API tRPC per a ressenyes (submit, listApproved, listAll, moderate, delete)
+- [x] API tRPC per a comandes (orders.submit, listAll, updateStatus, delete)
+- [x] Taula orders a la base de dades (MySQL)
+- [x] Guardar comandes a la BD quan es fan des del checkout
+- [x] Panell d'administració de comandes (/admin/comandes)
+- [x] Filtres per estat de pagament, entrega i forma de pagament
+- [x] Cerca per nom, email i telèfon
+- [x] Estadístiques ràpides (total, ingressos, pendents)
+- [x] Actualització automàtica cada 30 segons
+- [x] Notes internes per a cada comanda
+- [x] Correu automàtic al client quan la comanda es marca com a entregada
+- [x] Disseny responsiu (PC, mòbil, tauleta)
+- [x] Fotos reals pujades al CDN
+- [x] Exportació de comandes a CSV des del panell d'administració
+- [x] Camp deliveryEmailSent a la taula orders i columna al CSV
+- [x] Indicació visual de correu d'entrega enviat al panell de comandes
+- [x] Menú d'admin a la capçalera (visible només per a rol admin)
+- [x] Botó de recordatori de pagament al panell d'admin per a comandes pendents
+- [x] Camp paymentReminderSentAt a la BD per registrar l'últim enviament
+- [x] Formulari de contacte: enviament directe per correu (procediment tRPC contact.send)
+- [x] Corregir retall de fotos del carrusel amb object-position
+- [x] Afegir 7 fotos noves al carrusel del projecte en acció
+- [x] Missatge de confirmació visible al formulari de contacte després d'enviar
+- [x] Actualitzar data de recollida preventa de Maig 2026
+- [x] Substituir el logo SVG del far per la imatge PNG oficial del logo
+- [x] Afegir crèdits "Il·lustració de Núria Puig" a les dues imatges del lema
+- [x] Crear checkpoint final amb tots els canvis
+- [x] Publicar el lloc a elmardinsmeu.cat
+- [x] Botons de compartir a les xarxes socials al peu de pàgina
+- [x] Botó de copiar l'enllaç amb tooltip
+- [x] Configurar registres DNS a cdmon
+- [x] Generar certificat SSL per a www.elmardinsmeu.cat
+- [x] Optimitzar metaetiquetes SEO
+- [x] Afegir Open Graph tags per a xarxes socials
+- [x] Afegir structured data (schema.json) per a Google
+- [x] Registrar el web a Google Search Console
+- [x] Crear registre CNAME per a verificació de Google
+- [x] Arreglar certificat SSL per a elmardinsmeu.cat
+- [x] Verificar que Google Search Console detecta el registre CNAME
+- [x] Verificar que l'arrel del domini funciona amb SSL
+- [x] Afegir sitemap.xml per a indexació de Google
+- [x] Afegir robots.txt per a indicar a Google quines pàgines indexar
+- [x] Afegir botó "Contacta'ns per WhatsApp"
+- [x] Crear sistema de punts de recollida (BD + formulari de registre)
+- [x] Panell d'administració de punts de recollida (/admin/punts-recollida)
+- [x] Reorganitzar ressenyes del llibre (just després del bloc del llibre)
+- [x] Sistema de ressenyes de tallers/xerrades (BD + formulari + carrusel)
+- [x] Crear tests unitaris per a ressenyes de tallers
+- [x] Crear pàgina pública de punts de recollida (/punts-recollida)
+- [x] Crear template d'email de benvinguda per a partners
+- [x] Implementar mailer function per enviar welcome email
+- [x] Integrar welcome email al flux de registre de punts de recollida
+- [x] Afegir mapa interactiu a la pàgina de punts de recollida
+- [x] Afegir botons de contacte (WhatsApp i email) per oferir-se com a punt de recollida
+- [x] Afegir els 3 punts de recollida reals
+- [x] Afegir frase engrescadora per animar a oferir-se com a punt de recollida
+- [x] Implementar geocodificació automàtica per a noves adreces de punts de recollida
+- [x] Afegir animació de càrrega per al mapa i punts de recollida
+- [x] Afegir botó de "Punts de Recollida" a la pàgina d'inici
+- [x] Revisar i actualitzar informació dels punts de recollida
+- [x] Integrar Stripe per a pagaments amb targeta (base setup)
+- [x] Afegir selecció de punt de recollida al CartContext
+- [x] Crear procedure tRPC per a Stripe Checkout
+- [x] Implementar webhook de Stripe per confirmar pagaments
+- [x] Crear pàgina de confirmació de comanda amb resum, dades de recollida i instruccions de pagament
+- [x] Afegir Google Places Autocomplete al formulari de registre de punts de recollida
+- [x] Crear pàgina d'historial de comandes per a clients (/comandes)
+- [x] Afegir link "Les meves comandes" a la navegació per a usuaris autenticats
+- [x] Crear panell d'administració per moderar ressenyes de tallers (/admin/ressenyes-tallers)
+- [x] Afegir selecció de punt de recollida al checkout
+
+## Pendent
+- [ ] Promoure usuari a admin a la base de dades
+- [ ] Número de WhatsApp real (si es vol recuperar)
+- [ ] Fotos de noi amb samarreta (vinyes)
+- [ ] Foto de la il·lustradora Núria Puig pintant
+- [ ] Testimonis reals de clients per a les ressenyes
+- [ ] Publicar el lloc web (clicar "Publish" al panell)
+- [ ] Verificar que Google Search Console ha validat el registre TXT (espera 24-48 hores)
+- [ ] Enviar el sitemap a Google Search Console
+- [ ] Crear estratègia de reclutament per a punts de recollida
+- [ ] Preparar materials de difusió per a entitats (carta, imatges, xarxes socials)
+- [ ] Mostrar punts aprovats amb mapa interactiu (opcional)
+- [ ] Afegir més variants de productes (colors, talles)
+- [ ] Provar el flux complet de compra amb pagament
+- [x] Implementar integració completa de Stripe (checkout sessions, webhooks, confirmació de pagament)
+- [x] Afegir notificacions per email quan canvia l'estat de la comanda
+- [ ] Crear pàgina pública de seguiment de comandes (/seguiment-comanda)
+- [x] Crear dashboard d'analítiques de vendes per a admin (/admin/analitiques)

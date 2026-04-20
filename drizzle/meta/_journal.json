@@ -1,0 +1,76 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1772710668471,
+      "tag": "0000_secret_vertigo",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1772710724927,
+      "tag": "0001_illegal_weapon_omega",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1772720275036,
+      "tag": "0002_cloudy_malice",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1772721919103,
+      "tag": "0003_certain_nighthawk",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1772722362561,
+      "tag": "0004_icy_shadow_king",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1775996760373,
+      "tag": "0005_last_tinkerer",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1776073491062,
+      "tag": "0006_marvelous_ken_ellis",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1776077314040,
+      "tag": "0007_robust_jackpot",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1776079830613,
+      "tag": "0008_parallel_jubilee",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1776177964741,
+      "tag": "0009_skinny_zombie",
+      "breakpoints": true
+    }
+  ]
+}

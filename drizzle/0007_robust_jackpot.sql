@@ -1,0 +1,1 @@
+ALTER TABLE `workshopReviews` MODIFY COLUMN `eventTitle` varchar(256);

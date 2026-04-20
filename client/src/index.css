@@ -1,0 +1,268 @@
+/* =============================================================
+   El Mar dins Meu — Disseny: Mediterrània Artesanal
+   Paleta: Turquesa (#4AABB8), Beix/Crema (#E8D5B7), Marró terra (#5C3D2E)
+   Tipografia: Playfair Display (títols) + Nunito (cos) + Caveat (etiquetes)
+   Estètica: Collage/Polaroid, artesanal, càlid, mediterrani
+   ============================================================= */
+
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+:root {
+  /* Paleta Mediterrània Artesanal */
+  --radius: 0.75rem;
+
+  /* Turquesa mediterrània */
+  --primary: oklch(0.65 0.1 200);
+  --primary-foreground: oklch(0.98 0 0);
+
+  /* Beix càlid */
+  --secondary: oklch(0.88 0.04 75);
+  --secondary-foreground: oklch(0.35 0.05 55);
+
+  /* Fons turquesa suau */
+  --background: oklch(0.72 0.08 200);
+  --foreground: oklch(0.25 0.04 55);
+
+  /* Targetes blanques */
+  --card: oklch(0.99 0.005 80);
+  --card-foreground: oklch(0.25 0.04 55);
+
+  --popover: oklch(0.99 0.005 80);
+  --popover-foreground: oklch(0.25 0.04 55);
+
+  --muted: oklch(0.92 0.03 75);
+  --muted-foreground: oklch(0.5 0.04 55);
+
+  /* Accent beix/crema */
+  --accent: oklch(0.88 0.06 75);
+  --accent-foreground: oklch(0.3 0.05 55);
+
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+
+  --border: oklch(0.85 0.04 75);
+  --input: oklch(0.9 0.03 75);
+  --ring: oklch(0.65 0.1 200);
+
+  /* Colors personalitzats */
+  --turquoise: oklch(0.65 0.1 200);
+  --turquoise-light: oklch(0.78 0.08 200);
+  --turquoise-dark: oklch(0.5 0.1 200);
+  --beige: oklch(0.88 0.06 75);
+  --beige-dark: oklch(0.78 0.07 70);
+  --kraft: oklch(0.82 0.06 70);
+  --brown: oklch(0.35 0.07 55);
+  --brown-dark: oklch(0.25 0.06 50);
+  --cream: oklch(0.97 0.02 80);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Nunito', sans-serif;
+  }
+  h1, h2, h3 {
+    font-family: 'Playfair Display', serif;
+  }
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [type="button"]:not(:disabled),
+  [type="submit"]:not(:disabled),
+  [type="reset"]:not(:disabled),
+  a[href],
+  select:not(:disabled),
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled) {
+    @apply cursor-pointer;
+  }
+}
+
+@layer components {
+  .container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .flex {
+    min-height: 0;
+    min-width: 0;
+  }
+
+  @media (min-width: 640px) {
+    .container {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container {
+      padding-left: 2rem;
+      padding-right: 2rem;
+      max-width: 1280px;
+    }
+  }
+
+  /* Targeta producte estil polaroid */
+  .product-card {
+    background: white;
+    border-radius: 4px;
+    box-shadow: 4px 6px 20px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    position: relative;
+  }
+  .product-card:hover {
+    transform: translateY(-6px) rotate(0deg) !important;
+    box-shadow: 8px 12px 32px rgba(0,0,0,0.22), 0 4px 12px rgba(0,0,0,0.12);
+  }
+
+  /* Etiqueta kraft per a talles */
+  .kraft-tag {
+    font-family: 'Caveat', cursive;
+    background: oklch(0.82 0.06 70);
+    color: oklch(0.3 0.06 50);
+    border-radius: 4px;
+    position: relative;
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.15);
+  }
+  .kraft-tag::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -8px;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 2px;
+    background: oklch(0.6 0.06 55);
+  }
+  .kraft-tag::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -12px;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    border: 1.5px solid oklch(0.55 0.06 55);
+    background: transparent;
+  }
+
+  /* Preu en rodó */
+  .price-bubble {
+    font-family: 'Playfair Display', serif;
+    background: oklch(0.88 0.06 75);
+    color: oklch(0.35 0.07 55);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 3px 3px 10px rgba(0,0,0,0.12);
+    font-weight: 700;
+  }
+
+  /* Títol producte estil plantilla */
+  .product-title-box {
+    background: oklch(0.88 0.06 75);
+    border: 2px solid oklch(0.75 0.07 70);
+    border-radius: 12px;
+    font-family: 'Playfair Display', serif;
+    color: oklch(0.3 0.06 50);
+  }
+
+  /* Botó principal turquesa */
+  .btn-primary {
+    background: oklch(0.55 0.1 200);
+    color: white;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    border-radius: 50px;
+    transition: all 0.2s ease;
+    border: none;
+  }
+  .btn-primary:hover {
+    background: oklch(0.45 0.1 200);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(74,171,184,0.4);
+  }
+
+  /* Talla botó */
+  .size-btn {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    border: 2px solid oklch(0.75 0.07 70);
+    background: oklch(0.96 0.02 80);
+    color: oklch(0.35 0.06 55);
+    border-radius: 8px;
+    transition: all 0.15s ease;
+  }
+  .size-btn:hover, .size-btn.selected {
+    background: oklch(0.55 0.1 200);
+    border-color: oklch(0.55 0.1 200);
+    color: white;
+  }
+
+  /* Carro drawer */
+  .cart-drawer {
+    background: oklch(0.97 0.02 80);
+    box-shadow: -8px 0 40px rgba(0,0,0,0.15);
+  }
+}
+
+/* Animació entrada targetes */
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-slide-up {
+  animation: fadeSlideUp 0.5s ease forwards;
+}
+
+/* Textura de fons subtil */
+.bg-texture {
+  background-image: 
+    radial-gradient(circle at 20% 50%, rgba(255,255,255,0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255,255,255,0.06) 0%, transparent 40%);
+}
