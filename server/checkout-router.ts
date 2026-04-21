@@ -77,6 +77,9 @@ export const checkoutRouter = router({
         };
       } catch (error) {
         console.error("[Checkout] Error creating checkout session:", error);
+        if (error instanceof Error && error.message === "Stripe is not configured") {
+          throw new Error("Card payment is temporarily unavailable");
+        }
         throw new Error("Failed to create checkout session");
       }
     }),
@@ -98,6 +101,9 @@ export const checkoutRouter = router({
         };
       } catch (error) {
         console.error("[Checkout] Error retrieving session:", error);
+        if (error instanceof Error && error.message === "Stripe is not configured") {
+          throw new Error("Card payment is temporarily unavailable");
+        }
         throw new Error("Failed to retrieve checkout session");
       }
     }),

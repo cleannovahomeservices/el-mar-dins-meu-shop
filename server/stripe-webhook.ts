@@ -9,9 +9,13 @@ import { ENV } from "./_core/env";
 import { updateOrderStatus } from "./db";
 import { sendPaymentConfirmationEmail } from "./mailer";
 
-const stripe = new Stripe(ENV.stripeSecretKey);
+const stripe = ENV.stripeSecretKey ? new Stripe(ENV.stripeSecretKey) : null;
 
 export async function handleStripeWebhook(req: Request, res: Response) {
+  if (!stripe || !ENV.stripeWebhookSecret) {
+    return res.status(503).json({ error: "Stripe webhook is not configured" });
+  }
+
   const sig = req.headers["stripe-signature"] as string;
 
   if (!sig) {

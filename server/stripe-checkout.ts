@@ -6,7 +6,7 @@
 import Stripe from "stripe";
 import { ENV } from "./_core/env";
 
-const stripe = new Stripe(ENV.stripeSecretKey);
+const stripe = ENV.stripeSecretKey ? new Stripe(ENV.stripeSecretKey) : null;
 
 export interface CheckoutSessionInput {
   orderId: number;
@@ -24,6 +24,10 @@ export interface CheckoutSessionInput {
 }
 
 export async function createCheckoutSession(input: CheckoutSessionInput): Promise<string> {
+  if (!stripe) {
+    throw new Error("Stripe is not configured");
+  }
+
   const lineItems: Stripe.Checkout.SessionCreateParams['line_items'] = [];
 
   // Group items by product type for Stripe
@@ -78,5 +82,9 @@ export async function createCheckoutSession(input: CheckoutSessionInput): Promis
 }
 
 export async function getCheckoutSession(sessionId: string): Promise<Stripe.Checkout.Session> {
+  if (!stripe) {
+    throw new Error("Stripe is not configured");
+  }
+
   return await stripe.checkout.sessions.retrieve(sessionId);
 }
