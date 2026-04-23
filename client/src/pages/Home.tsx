@@ -13,7 +13,6 @@ import { useCart } from "@/contexts/CartContext";
 import CartDrawer from "@/components/CartDrawer";
 import ProductCard, { Product } from "@/components/ProductCard";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { getLoginUrl } from "@/const";
 import { WorkshopReviewForm } from "@/components/WorkshopReviewForm";
 import { WorkshopReviewsCarousel } from "@/components/WorkshopReviewsCarousel";
 
@@ -1276,7 +1275,7 @@ export default function Home() {
             {/* Botó d'inici de sessió — visible només si no estàs autenticat */}
             {!user && (
               <button
-                onClick={() => { window.location.href = getLoginUrl(); }}
+                onClick={() => { window.location.href = "/login"; }}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-full font-bold text-sm transition-all hover:scale-105"
                 style={{
                   background: "oklch(0.45 0.1 200 / 0.7)",

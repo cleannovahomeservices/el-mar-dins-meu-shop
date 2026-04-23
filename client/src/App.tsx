@@ -23,12 +23,13 @@ import OrderConfirmation from "./pages/OrderConfirmation";
 import OrderHistory from "./pages/OrderHistory";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
 import AdminAnalytics from "./pages/AdminAnalytics";
+import Login from "./pages/Login";
 
 function Router() {
-  // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/login" component={Login} />
       <Route path="/contacte" component={Contact} />
       <Route path="/punts-recollida" component={PickupPointsPage} />
       <Route path="/registre-punt-recollida" component={RegisterPickupPoint} />
