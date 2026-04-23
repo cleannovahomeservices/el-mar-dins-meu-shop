@@ -7,8 +7,8 @@ let cachedApp: unknown = null;
 async function getApp() {
   if (cachedApp || importError) return;
   try {
-    const mod = await import("../server/_core/app");
-    cachedApp = mod.createApp();
+    const mod = await import("../dist/vercel-app.mjs");
+    cachedApp = mod.default;
   } catch (err) {
     importError = err;
     console.error("[api/[...path]] Dynamic import error:", err);
