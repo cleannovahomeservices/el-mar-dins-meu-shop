@@ -270,6 +270,42 @@ class SDKServer {
     const signedInAt = new Date();
     let user = await db.getUserByOpenId(sessionUserId);
 
+    // For admin sessions (openId starts with "admin_"), bypass Manus OAuth
+    if (!user && sessionUserId.startsWith("admin_")) {
+      const email = sessionUserId.slice("admin_".length);
+      const adminEmails = (process.env.ADMIN_EMAILS ?? "")
+        .split(",").map(e => e.trim()).filter(Boolean);
+      if (adminEmails.includes(email)) {
+        try {
+          await db.upsertUser({
+            openId: sessionUserId,
+            name: email,
+            email,
+            loginMethod: "admin",
+            role: "admin",
+            lastSignedIn: signedInAt,
+          });
+          user = await db.getUserByOpenId(sessionUserId);
+        } catch (error) {
+          console.warn("[Auth] DB unavailable for admin user, using synthetic user:", error);
+        }
+        // If DB is unavailable, return a synthetic admin user so the session still works
+        if (!user) {
+          return {
+            id: 0,
+            openId: sessionUserId,
+            name: email,
+            email,
+            loginMethod: "admin",
+            role: "admin",
+            createdAt: signedInAt,
+            updatedAt: signedInAt,
+            lastSignedIn: signedInAt,
+          } as User;
+        }
+      }
+    }
+
     // If user not in DB, sync from OAuth server automatically
     if (!user) {
       try {
