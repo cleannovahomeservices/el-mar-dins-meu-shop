@@ -1,26 +1,32 @@
 import { useState } from "react";
-import { trpc } from "@/lib/trpc";
-import { useLocation } from "wouter";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [, navigate] = useLocation();
+  const [loading, setLoading] = useState(false);
 
-  const loginMutation = trpc.auth.adminLogin.useMutation({
-    onSuccess: () => {
-      window.location.href = "/admin/comandes";
-    },
-    onError: (err) => {
-      setError(err.message);
-    },
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    loginMutation.mutate({ email: email.trim().toLowerCase(), password });
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error ?? "Error desconegut");
+      } else {
+        window.location.href = "/admin/comandes";
+      }
+    } catch {
+      setError("No s'ha pogut connectar amb el servidor");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -82,11 +88,11 @@ export default function Login() {
 
           <button
             type="submit"
-            disabled={loginMutation.isPending}
+            disabled={loading}
             className="w-full py-2.5 rounded-lg font-bold text-white transition-all hover:opacity-90 disabled:opacity-60"
             style={{ background: "oklch(0.55 0.1 200)", fontFamily: "'Nunito', sans-serif" }}
           >
-            {loginMutation.isPending ? "Accedint..." : "Accedir"}
+            {loading ? "Accedint..." : "Accedir"}
           </button>
 
           <a

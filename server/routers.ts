@@ -51,29 +51,6 @@ export const appRouter = router({
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
       return { success: true } as const;
     }),
-    adminLogin: publicProcedure
-      .input(z.object({ email: z.string().email(), password: z.string().min(1) }))
-      .mutation(async ({ input, ctx }) => {
-        const { ENV } = await import("./_core/env");
-        const { sdk } = await import("./_core/sdk");
-        const { COOKIE_NAME, ONE_YEAR_MS } = await import("@shared/const");
-
-        if (input.password !== ENV.adminSecret) {
-          throw new TRPCError({ code: "UNAUTHORIZED", message: "Contrasenya incorrecta" });
-        }
-        if (!ENV.adminEmails.includes(input.email)) {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Aquest correu no té permisos d'administrador" });
-        }
-
-        const openId = `admin_${input.email}`;
-        const { upsertUser } = await import("./db");
-        await upsertUser({ openId, name: input.email, email: input.email, loginMethod: "admin", role: "admin", lastSignedIn: new Date() });
-
-        const sessionToken = await sdk.createSessionToken(openId, { name: input.email, expiresInMs: ONE_YEAR_MS });
-        const cookieOptions = getSessionCookieOptions(ctx.req);
-        ctx.res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
-        return { success: true } as const;
-      }),
   }),
 
   // ── Comandes ─────────────────────────────────────────────────
