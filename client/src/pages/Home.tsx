@@ -13,6 +13,7 @@ import { useCart } from "@/contexts/CartContext";
 import CartDrawer from "@/components/CartDrawer";
 import ProductCard, { Product } from "@/components/ProductCard";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { getLoginUrl } from "@/const";
 import { WorkshopReviewForm } from "@/components/WorkshopReviewForm";
 import { WorkshopReviewsCarousel } from "@/components/WorkshopReviewsCarousel";
 
@@ -1272,6 +1273,22 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Botó d'inici de sessió — visible només si no estàs autenticat */}
+            {!user && (
+              <button
+                onClick={() => { window.location.href = getLoginUrl(); }}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-full font-bold text-sm transition-all hover:scale-105"
+                style={{
+                  background: "oklch(0.45 0.1 200 / 0.7)",
+                  color: "white",
+                  fontFamily: "'Nunito', sans-serif",
+                  border: "2px solid rgba(255,255,255,0.25)",
+                }}
+              >
+                <span className="text-xs">Accedir</span>
+              </button>
+            )}
+
             {/* Link a l'historial de comandes — visible per a usuaris autenticats */}
             {user && !isAdmin && (
               <Link href="/comandes">

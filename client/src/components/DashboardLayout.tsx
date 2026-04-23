@@ -62,10 +62,10 @@ export default function DashboardLayout({
         <div className="flex flex-col items-center gap-8 p-8 max-w-md w-full">
           <div className="flex flex-col items-center gap-6">
             <h1 className="text-2xl font-semibold tracking-tight text-center">
-              Sign in to continue
+              Inicia sessió per continuar
             </h1>
             <p className="text-sm text-muted-foreground text-center max-w-sm">
-              Access to this dashboard requires authentication. Continue to launch the login flow.
+              Necessites autenticació per accedir al panell d'administració.
             </p>
           </div>
           <Button
@@ -75,7 +75,23 @@ export default function DashboardLayout({
             size="lg"
             className="w-full shadow-lg hover:shadow-xl transition-all"
           >
-            Sign in
+            Inicia sessió
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (user.role !== 'admin') {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="flex flex-col items-center gap-4 p-8 max-w-md w-full text-center">
+          <h1 className="text-2xl font-semibold tracking-tight">Accés restringit</h1>
+          <p className="text-sm text-muted-foreground">
+            Aquesta secció és només per a administradors. El teu compte ({user.email}) no té permisos d'administrador.
+          </p>
+          <Button variant="outline" onClick={() => window.location.href = '/'}>
+            Tornar a l'inici
           </Button>
         </div>
       </div>
