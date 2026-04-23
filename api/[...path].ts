@@ -1,11 +1,11 @@
 import "dotenv/config";
 import type { IncomingMessage, ServerResponse } from "http";
+import { createApp } from "../server/_core/app";
 
 let cachedApp: unknown = null;
 let initError: unknown = null;
 
 try {
-  const { createApp } = require("../server/_core/app");
   cachedApp = createApp();
 } catch (err) {
   initError = err;
