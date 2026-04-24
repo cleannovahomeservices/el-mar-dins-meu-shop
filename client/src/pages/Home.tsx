@@ -1256,7 +1256,7 @@ export default function Home() {
         <div className="container flex items-center justify-between py-4">
           <div className="flex items-center gap-3">
             <img
-              src="https://d2xsxph8kpxj0f.cloudfront.net/310519663296928445/NnesjWskmtgTij7oaTjBUS/logoELMARDINSMEU_5d9b7206.png"
+              src="/logo.png"
               alt="El Mar dins Meu — Logo far"
               className="h-16 w-auto"
             />
@@ -1625,7 +1625,7 @@ export default function Home() {
         <div className="container text-center">
           <div className="flex items-center justify-center gap-3 mb-4">
             <img
-              src="https://d2xsxph8kpxj0f.cloudfront.net/310519663296928445/NnesjWskmtgTij7oaTjBUS/logoELMARDINSMEU_5d9b7206.png"
+              src="/logo.png"
               alt="El Mar dins Meu — Logo far"
               className="h-20 w-auto"
             />
