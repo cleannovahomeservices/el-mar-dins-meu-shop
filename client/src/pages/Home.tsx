@@ -602,7 +602,7 @@ function BookSection() {
               {/* Botó compartir a WhatsApp */}
               <button
                 onClick={() => {
-                  const url = "https://elmarshop-nnesjwsk.manus.space";
+                  const url = window.location.origin;
                   const text = `Descobreix "El Mar dins Meu", el llibre de la Montse Marquès il·lustrat per Núria Puig. Una obra valenta i necessària! 📖💜 ${url} #ElMardinsMeu`;
                   window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
                 }}
@@ -1419,14 +1419,107 @@ export default function Home() {
         </div>
       </header>
 
-      {/* ===== HERO — Il·lustració portada ===== */}
-      <section className="w-full" style={{ background: "oklch(0.97 0.01 55)" }}>
-        <img
-          src="https://d2xsxph8kpxj0f.cloudfront.net/310519663296928445/NnesjWskmtgTij7oaTjBUS/portada_illustracio_668c66a4.png"
-          alt="El mar dins meu — Montse Marquès, il·lustrat per Núria Puig"
-          className="w-full"
-          style={{ display: "block", width: "100%", height: "auto", maxHeight: "480px", objectFit: "contain", objectPosition: "center" }}
-        />
+      {/* ===== HERO — Il·lustració portada + missatge ===== */}
+      <section className="w-full py-10 sm:py-14" style={{ background: "oklch(0.97 0.01 55)" }}>
+        <div className="container grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+          <div>
+            <h2 className="font-black text-4xl sm:text-5xl mb-2"
+              style={{ fontFamily: "'Playfair Display', serif", color: "oklch(0.3 0.06 50)" }}>
+              El mar dins meu
+            </h2>
+            <p className="text-xl sm:text-2xl font-bold mb-3"
+              style={{ fontFamily: "'Nunito', sans-serif", color: "oklch(0.45 0.1 200)" }}>
+              Fem visible l'invisible
+            </p>
+            <p className="text-base sm:text-lg leading-relaxed max-w-xl"
+              style={{ fontFamily: "'Nunito', sans-serif", color: "oklch(0.4 0.05 55)" }}>
+              Un projecte per fer visible una realitat sovint silenciada: l'abús sexual infantil.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <button
+                onClick={() => window.scrollTo({ top: 1400, behavior: "smooth" })}
+                className="px-6 py-3 rounded-xl font-bold text-white"
+                style={{ background: "oklch(0.55 0.1 200)", fontFamily: "'Nunito', sans-serif" }}
+              >
+                Comprar samarreta
+              </button>
+              <button
+                onClick={() => window.scrollTo({ top: 900, behavior: "smooth" })}
+                className="px-6 py-3 rounded-xl font-bold"
+                style={{ background: "oklch(0.88 0.06 75)", color: "oklch(0.35 0.07 55)", fontFamily: "'Nunito', sans-serif" }}
+              >
+                Participa
+              </button>
+            </div>
+          </div>
+          <img
+            src="https://d2xsxph8kpxj0f.cloudfront.net/310519663296928445/NnesjWskmtgTij7oaTjBUS/portada_illustracio_668c66a4.png"
+            alt="El mar dins meu — Montse Marquès, il·lustrat per Núria Puig"
+            className="w-full rounded-2xl"
+            style={{ maxHeight: "440px", objectFit: "contain", objectPosition: "center", background: "white" }}
+          />
+        </div>
+      </section>
+
+      {/* ===== BLOC PROJECTE ===== */}
+      <section className="py-10" style={{ background: "oklch(0.96 0.03 80)" }}>
+        <div className="container">
+          <p className="text-center text-lg max-w-4xl mx-auto leading-relaxed"
+            style={{ fontFamily: "'Nunito', sans-serif", color: "oklch(0.35 0.06 55)" }}>
+            El mar dins meu és un àlbum il·lustrat i un projecte educatiu que vol fer visible una realitat sovint silenciada: l'abús sexual infantil.
+          </p>
+        </div>
+      </section>
+
+      {/* ===== COM FORMAR PART DEL PROJECTE ===== */}
+      <section className="py-12" style={{ background: "oklch(0.98 0.01 75)" }}>
+        <div className="container">
+          <h3 className="text-center font-black text-3xl mb-8"
+            style={{ fontFamily: "'Playfair Display', serif", color: "oklch(0.3 0.06 50)" }}>
+            Com formar part del projecte
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                title: "Samarretes",
+                text: "Compra una samarreta i ajuda a fer créixer el projecte i a fer visible una realitat sovint silenciada.",
+              },
+              {
+                title: "Conte 'El mar dins meu'",
+                text: "Un àlbum il·lustrat per parlar, posar paraules i obrir espais de consciència sobre l'abús sexual infantil.",
+              },
+              {
+                title: "Xerrades i tallers",
+                text: "Organitzem xerrades, tallers i espais de diàleg per sensibilitzar i prevenir l'abús sexual infantil.",
+              },
+            ].map((item) => (
+              <div key={item.title} className="rounded-2xl p-6 bg-white"
+                style={{ border: "2px solid oklch(0.88 0.06 75)" }}>
+                <h4 className="font-black text-xl mb-3"
+                  style={{ fontFamily: "'Playfair Display', serif", color: "oklch(0.35 0.07 55)" }}>
+                  {item.title}
+                </h4>
+                <p className="text-sm leading-relaxed"
+                  style={{ fontFamily: "'Nunito', sans-serif", color: "oklch(0.45 0.04 55)" }}>
+                  {item.text}
+                </p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-8 text-center">
+            <p className="font-bold mb-3"
+              style={{ fontFamily: "'Nunito', sans-serif", color: "oklch(0.35 0.06 55)" }}>
+              Vols portar el projecte al teu espai?
+            </p>
+            <button
+              onClick={() => window.scrollTo({ top: 5200, behavior: "smooth" })}
+              className="px-6 py-3 rounded-xl font-bold text-white"
+              style={{ background: "oklch(0.55 0.1 200)", fontFamily: "'Nunito', sans-serif" }}
+            >
+              Contacte
+            </button>
+          </div>
+        </div>
       </section>
 
       {/* ===== EL LLIBRE ===== */}
@@ -1460,7 +1553,7 @@ export default function Home() {
         <div className="text-center mb-10">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-4 font-bold text-sm"
             style={{ background: "oklch(0.75 0.18 55)", color: "white", fontFamily: "'Nunito', sans-serif" }}>
-            ⏳ PREVENTA — Recollida a partir de Maig 2026
+            ⏳ PRE-COMANDA oberta fins al 30 de maig
           </div>
           <h2 className="text-white font-black text-3xl sm:text-4xl drop-shadow"
             style={{ fontFamily: "'Playfair Display', serif" }}>
@@ -1470,6 +1563,22 @@ export default function Home() {
             style={{ fontFamily: "'Nunito', sans-serif" }}>
             Amb la compra d'una samarreta ens ajudes a difondre el missatge, a sensibilitzar la població i a prevenir l'abús i les violències cap als infants.
           </p>
+          <div className="mt-5 flex flex-wrap justify-center gap-3">
+            <button
+              onClick={() => window.scrollTo({ top: 1400, behavior: "smooth" })}
+              className="px-6 py-3 rounded-xl font-bold text-white"
+              style={{ background: "oklch(0.55 0.1 200)", fontFamily: "'Nunito', sans-serif" }}
+            >
+              Comprar samarreta
+            </button>
+            <button
+              onClick={() => window.scrollTo({ top: 900, behavior: "smooth" })}
+              className="px-6 py-3 rounded-xl font-bold"
+              style={{ background: "oklch(0.88 0.06 75)", color: "oklch(0.35 0.07 55)", fontFamily: "'Nunito', sans-serif" }}
+            >
+              Participa
+            </button>
+          </div>
           <div className="mt-4 inline-flex items-start gap-3 px-5 py-3 rounded-2xl text-sm text-left max-w-xl mx-auto"
             style={{ background: "rgba(255,255,255,0.15)", fontFamily: "'Nunito', sans-serif" }}>
             <span className="text-xl shrink-0">🎨</span>
@@ -1535,7 +1644,7 @@ export default function Home() {
           <div className="max-w-2xl mx-auto text-center">
             <p className="text-white font-black text-xl sm:text-2xl leading-relaxed"
               style={{ fontFamily: "'Caveat', cursive", fontSize: "26px" }}>
-              Els beneficis del projecte van destinats a fer arribar aquest missatge a més persones.
+              Els beneficis de la venda es destinen íntegrament a l'associació Àngel Blau. El càlcul es farà en finalitzar la campanya.
             </p>
             <p className="text-white/75 text-sm mt-3" style={{ fontFamily: "'Nunito', sans-serif" }}>
               Cada samarreta que compres contribueix directament a la sensibilització i a la prevenció dels abusos sexuals infantils.
@@ -1547,18 +1656,18 @@ export default function Home() {
       {/* ===== ASSOCIACIONS ===== */}
       <AssociationsSection />
 
-      {/* ===== COM FER UN ENCÀRREC ===== */}
+      {/* ===== COM FUNCIONA ===== */}
       <section className="py-12" style={{ background: "oklch(0.55 0.1 200)" }}>
         <div className="container">
           <h2 className="text-white font-black text-2xl sm:text-3xl text-center mb-8"
             style={{ fontFamily: "'Playfair Display', serif" }}>
-            Com fer un encàrrec
+            Com funciona
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {[
-              { num: "1", title: "Tria la samarreta", desc: "Selecciona el model i la talla que vols del catàleg" },
-              { num: "2", title: "Afegeix a la cistella", desc: "Pots afegir diversos productes i revisar el total" },
-              { num: "3", title: "Envia la comanda", desc: "Omple les dades i tria la forma de pagament. T'enviarem la confirmació!" },
+              { num: "1", title: "Campanya oberta", desc: "Campanya oberta fins al 30 de maig." },
+              { num: "2", title: "Pre-comanda", desc: "Produirem les samarretes un cop finalitzada la campanya." },
+              { num: "3", title: "Enviament i recollida", desc: "Els enviaments i recollides es faran a partir de mitjans de juny." },
             ].map(step => (
               <div key={step.num} className="text-center">
                 <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 font-black text-2xl"
@@ -1579,6 +1688,11 @@ export default function Home() {
                 </p>
               </div>
             ))}
+          </div>
+          <div className="mt-8 text-center">
+            <p className="text-white/90 font-semibold" style={{ fontFamily: "'Nunito', sans-serif" }}>
+              Recollida gratuïta · Enviament a domicili: 5 € · Enviament gratuït a partir de 50 €
+            </p>
           </div>
         </div>
       </section>
@@ -1607,12 +1721,43 @@ export default function Home() {
             </div>
             <div className="flex items-center gap-3 bg-white rounded-2xl px-6 py-4 shadow-sm"
               style={{ border: "2px solid oklch(0.78 0.07 70)" }}>
-              <span className="text-2xl">🤝</span>
+              <span className="text-2xl">💳</span>
               <span className="font-bold text-sm"
                 style={{ color: "oklch(0.35 0.07 55)", fontFamily: "'Nunito', sans-serif" }}>
-                Pagament en mà
+                Pagament amb targeta
               </span>
             </div>
+          </div>
+          <p className="text-xs mt-4"
+            style={{ color: "oklch(0.55 0.04 55)", fontFamily: "'Nunito', sans-serif" }}>
+            El pagament es gestiona a través del nostre compte.
+          </p>
+        </div>
+      </section>
+
+      {/* ===== FAQ ===== */}
+      <section className="py-12" style={{ background: "oklch(0.96 0.03 80)" }}>
+        <div className="container max-w-3xl">
+          <h3 className="text-center font-black text-3xl mb-8"
+            style={{ fontFamily: "'Playfair Display', serif", color: "oklch(0.3 0.06 50)" }}>
+            FAQ
+          </h3>
+          <div className="space-y-3">
+            {[
+              ["Quan arribarà la meva comanda?", "És una pre-comanda. Els enviaments i recollides es faran a partir de mitjans de juny."],
+              ["Com puc participar en el projecte?", "Pots comprar una samarreta, compartir el conte o organitzar una xerrada/taller al teu espai."],
+              ["Hi ha opció d'enviament i recollida?", "Sí. Pots triar recollida gratuïta o enviament a domicili per 5€ (gratis a partir de 50€)."],
+              ["Com puc contactar-vos?", "Des del formulari de contacte de la web i també per correu a escoltem@elmardinsmeu.cat."],
+            ].map(([q, a]) => (
+              <details key={q} className="bg-white rounded-xl p-4" style={{ border: "2px solid oklch(0.88 0.06 75)" }}>
+                <summary className="font-bold cursor-pointer" style={{ fontFamily: "'Nunito', sans-serif", color: "oklch(0.35 0.06 55)" }}>
+                  {q}
+                </summary>
+                <p className="mt-2 text-sm leading-relaxed" style={{ fontFamily: "'Nunito', sans-serif", color: "oklch(0.45 0.05 55)" }}>
+                  {a}
+                </p>
+              </details>
+            ))}
           </div>
         </div>
       </section>
