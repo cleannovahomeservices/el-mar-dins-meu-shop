@@ -155,7 +155,7 @@ export default function CartDrawer() {
               Fer l'encàrrec →
             </button>
             <p className="text-center text-xs text-[oklch(0.55_0.04_55)]">
-              Pagament per transferència o en mà
+              Pagament amb targeta o transferència
             </p>
           </div>
         )}

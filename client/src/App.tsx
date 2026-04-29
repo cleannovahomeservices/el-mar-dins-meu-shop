@@ -10,7 +10,7 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { CartProvider } from "./contexts/CartContext";
-import Home from "./pages/Home";
+import Home from "./pages/HomeCampaign";
 import Contact from "./pages/Contact";
 import AdminReviews from "./pages/AdminReviews";
 import AdminOrders from "./pages/AdminOrders";

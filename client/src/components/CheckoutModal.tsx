@@ -6,7 +6,7 @@
    ============================================================= */
 
 import { useState, useEffect } from "react";
-import { X, CheckCircle, Building2, HandCoins, Mail, MapPin, CreditCard } from "lucide-react";
+import { X, CheckCircle, Building2, Mail, MapPin, CreditCard, Truck } from "lucide-react";
 import { useCart, CartItem } from "@/contexts/CartContext";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -17,7 +17,8 @@ interface Props {
   onClose: () => void;
 }
 
-type PaymentMethod = "transferencia" | "enmà" | "stripe";
+type PaymentMethod = "transferencia" | "stripe";
+type DeliveryMethod = "pickup" | "home";
 
 export default function CheckoutModal({ items, totalPrice, onClose }: Props) {
   const { clearCart, selectedPickupPointId, setSelectedPickupPointId } = useCart();
@@ -28,6 +29,10 @@ export default function CheckoutModal({ items, totalPrice, onClose }: Props) {
     email: "",
     notes: "",
   });
+  const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>("pickup");
+  const [shippingAddress, setShippingAddress] = useState("");
+  const [shippingCity, setShippingCity] = useState("");
+  const [shippingPostalCode, setShippingPostalCode] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [customerName, setCustomerName] = useState("");
 
@@ -60,8 +65,25 @@ export default function CheckoutModal({ items, totalPrice, onClose }: Props) {
     },
   });
 
+  const shippingCost = deliveryMethod === "home" ? (totalPrice >= 50 ? 0 : 5) : 0;
+  const totalWithShipping = totalPrice + shippingCost;
+
   const handleSubmit = () => {
-    if (!form.name || !form.phone || !form.email || !paymentMethod || !selectedPickupPointId) return;
+    const hasPickup = deliveryMethod === "pickup" ? Boolean(selectedPickupPointId) : true;
+    const hasHomeAddress =
+      deliveryMethod === "home"
+        ? Boolean(shippingAddress.trim() && shippingCity.trim() && shippingPostalCode.trim())
+        : true;
+    if (!form.name || !form.phone || !form.email || !paymentMethod || !hasPickup || !hasHomeAddress) return;
+
+    const fullNotes = [
+      form.notes?.trim(),
+      deliveryMethod === "home"
+        ? `Enviament a domicili: ${shippingAddress.trim()}, ${shippingPostalCode.trim()} ${shippingCity.trim()}`
+        : "Recollida gratuïta en punt de recollida",
+    ]
+      .filter(Boolean)
+      .join("\n");
 
     if (paymentMethod === 'stripe') {
       // Create Stripe checkout session
@@ -75,25 +97,25 @@ export default function CheckoutModal({ items, totalPrice, onClose }: Props) {
           quantity: i.quantity,
           price: i.price,
         })),
-        pickupPointId: selectedPickupPointId,
+        pickupPointId: deliveryMethod === "pickup" ? selectedPickupPointId : undefined,
         origin: window.location.origin,
       });
     } else {
-      // Submit order directly for bank transfer or cash payment
+      // Submit order directly for bank transfer
       submitOrderMutation.mutate({
         name: form.name,
         phone: form.phone,
         email: form.email,
-        notes: form.notes || undefined,
+        notes: fullNotes || undefined,
         paymentMethod,
-        pickupPointId: selectedPickupPointId,
+        pickupPointId: deliveryMethod === "pickup" ? selectedPickupPointId ?? undefined : undefined,
         items: items.map(i => ({
           name: i.name,
           size: i.size,
           quantity: i.quantity,
           price: i.price,
         })),
-        totalPrice,
+        totalPrice: totalWithShipping,
       });
     }
   };
@@ -110,12 +132,6 @@ export default function CheckoutModal({ items, totalPrice, onClose }: Props) {
       label: "Transferència bancària",
       desc: "Un cop confirmada la comanda, us enviarem les dades de pagament",
       icon: <Building2 size={22} className="text-[oklch(0.55_0.1_200)]" />,
-    },
-    {
-      id: "enmà",
-      label: "Pagament en mà",
-      desc: "Paga en el moment de recollir la comanda",
-      icon: <HandCoins size={22} className="text-[oklch(0.55_0.1_200)]" />,
     },
   ];
 
@@ -181,11 +197,17 @@ export default function CheckoutModal({ items, totalPrice, onClose }: Props) {
                     </span>
                   </div>
                 ))}
+                <div className="border-t border-[oklch(0.85_0.04_75)] pt-2 flex justify-between text-sm">
+                  <span className="text-[oklch(0.3_0.06_50)]">Enviament</span>
+                  <span className="font-semibold text-[oklch(0.35_0.07_55)]">
+                    {deliveryMethod === "home" ? `${shippingCost.toFixed(0)}€` : "Gratuït"}
+                  </span>
+                </div>
                 <div className="border-t border-[oklch(0.85_0.04_75)] pt-2 flex justify-between font-bold">
-                  <span className="text-[oklch(0.3_0.06_50)]">Total</span>
+                  <span className="text-[oklch(0.3_0.06_50)]">Total final</span>
                   <span className="text-[oklch(0.35_0.07_55)] text-lg"
                     style={{ fontFamily: "'Playfair Display', serif" }}>
-                    {totalPrice.toFixed(0)}€
+                    {totalWithShipping.toFixed(0)}€
                   </span>
                 </div>
               </div>
@@ -254,42 +276,114 @@ export default function CheckoutModal({ items, totalPrice, onClose }: Props) {
               </div>
             </div>
 
-            {/* Punt de recollida */}
+            {/* Opció d'enviament */}
             <div>
               <h3 className="font-bold text-[oklch(0.3_0.06_50)] mb-3 text-sm uppercase tracking-wide">
-                Punt de recollida *
+                Enviament *
               </h3>
-              <div className="space-y-2">
-                {pickupPoints.length === 0 ? (
-                  <p className="text-sm text-[oklch(0.5_0.04_55)] p-3 bg-[oklch(0.96_0.02_80)] rounded-xl">
-                    No hi ha punts de recollida disponibles. Torna-ho a intentar més tard.
-                  </p>
-                ) : (
-                  pickupPoints.map(point => (
-                    <button
-                      key={point.id}
-                      onClick={() => setSelectedPickupPointId(point.id)}
-                      className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${
-                        selectedPickupPointId === point.id
-                          ? "border-[oklch(0.55_0.1_200)] bg-[oklch(0.92_0.04_200)]"
-                          : "border-[oklch(0.85_0.04_75)] bg-[oklch(0.97_0.02_80)] hover:border-[oklch(0.7_0.08_200)]"
-                      }`}
-                    >
-                      <div className="flex-shrink-0">
-                        <MapPin size={22} className="text-[oklch(0.55_0.1_200)]" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="font-bold text-[oklch(0.3_0.06_50)] text-sm">{point.name}</div>
-                        <div className="text-xs text-[oklch(0.55_0.04_55)]">{point.address}</div>
-                      </div>
-                      {selectedPickupPointId === point.id && (
-                        <CheckCircle size={18} className="ml-auto flex-shrink-0 text-[oklch(0.55_0.1_200)]" />
-                      )}
-                    </button>
-                  ))
-                )}
+              <div className="space-y-2 mb-4">
+                <button
+                  onClick={() => setDeliveryMethod("home")}
+                  className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${
+                    deliveryMethod === "home"
+                      ? "border-[oklch(0.55_0.1_200)] bg-[oklch(0.92_0.04_200)]"
+                      : "border-[oklch(0.85_0.04_75)] bg-[oklch(0.97_0.02_80)] hover:border-[oklch(0.7_0.08_200)]"
+                  }`}
+                >
+                  <Truck size={22} className="text-[oklch(0.55_0.1_200)]" />
+                  <div className="flex-1">
+                    <div className="font-bold text-[oklch(0.3_0.06_50)] text-sm">Enviament a domicili</div>
+                    <div className="text-xs text-[oklch(0.55_0.04_55)]">5€ · Gratuït a partir de 50€</div>
+                  </div>
+                </button>
+                <button
+                  onClick={() => setDeliveryMethod("pickup")}
+                  className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${
+                    deliveryMethod === "pickup"
+                      ? "border-[oklch(0.55_0.1_200)] bg-[oklch(0.92_0.04_200)]"
+                      : "border-[oklch(0.85_0.04_75)] bg-[oklch(0.97_0.02_80)] hover:border-[oklch(0.7_0.08_200)]"
+                  }`}
+                >
+                  <MapPin size={22} className="text-[oklch(0.55_0.1_200)]" />
+                  <div className="flex-1">
+                    <div className="font-bold text-[oklch(0.3_0.06_50)] text-sm">Recollida gratuïta</div>
+                    <div className="text-xs text-[oklch(0.55_0.04_55)]">Tria un punt de recollida</div>
+                  </div>
+                </button>
               </div>
             </div>
+
+            {deliveryMethod === "home" ? (
+              <div>
+                <h3 className="font-bold text-[oklch(0.3_0.06_50)] mb-3 text-sm uppercase tracking-wide">
+                  Adreça d'enviament *
+                </h3>
+                <div className="space-y-3">
+                  <input
+                    type="text"
+                    value={shippingAddress}
+                    onChange={e => setShippingAddress(e.target.value)}
+                    placeholder="Carrer i número"
+                    className="w-full border-2 border-[oklch(0.85_0.04_75)] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[oklch(0.55_0.1_200)] transition-colors"
+                    style={{ fontFamily: "'Nunito', sans-serif" }}
+                  />
+                  <div className="grid grid-cols-2 gap-3">
+                    <input
+                      type="text"
+                      value={shippingPostalCode}
+                      onChange={e => setShippingPostalCode(e.target.value)}
+                      placeholder="Codi postal"
+                      className="w-full border-2 border-[oklch(0.85_0.04_75)] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[oklch(0.55_0.1_200)] transition-colors"
+                      style={{ fontFamily: "'Nunito', sans-serif" }}
+                    />
+                    <input
+                      type="text"
+                      value={shippingCity}
+                      onChange={e => setShippingCity(e.target.value)}
+                      placeholder="Població"
+                      className="w-full border-2 border-[oklch(0.85_0.04_75)] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[oklch(0.55_0.1_200)] transition-colors"
+                      style={{ fontFamily: "'Nunito', sans-serif" }}
+                    />
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <h3 className="font-bold text-[oklch(0.3_0.06_50)] mb-3 text-sm uppercase tracking-wide">
+                  Punt de recollida *
+                </h3>
+                <div className="space-y-2">
+                  {pickupPoints.length === 0 ? (
+                    <p className="text-sm text-[oklch(0.5_0.04_55)] p-3 bg-[oklch(0.96_0.02_80)] rounded-xl">
+                      No hi ha punts de recollida disponibles. Torna-ho a intentar més tard.
+                    </p>
+                  ) : (
+                    pickupPoints.map(point => (
+                      <button
+                        key={point.id}
+                        onClick={() => setSelectedPickupPointId(point.id)}
+                        className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${
+                          selectedPickupPointId === point.id
+                            ? "border-[oklch(0.55_0.1_200)] bg-[oklch(0.92_0.04_200)]"
+                            : "border-[oklch(0.85_0.04_75)] bg-[oklch(0.97_0.02_80)] hover:border-[oklch(0.7_0.08_200)]"
+                        }`}
+                      >
+                        <div className="flex-shrink-0">
+                          <MapPin size={22} className="text-[oklch(0.55_0.1_200)]" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-bold text-[oklch(0.3_0.06_50)] text-sm">{point.name}</div>
+                          <div className="text-xs text-[oklch(0.55_0.04_55)]">{point.address}</div>
+                        </div>
+                        {selectedPickupPointId === point.id && (
+                          <CheckCircle size={18} className="ml-auto flex-shrink-0 text-[oklch(0.55_0.1_200)]" />
+                        )}
+                      </button>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Mètode de pagament */}
             <div>
@@ -323,7 +417,16 @@ export default function CheckoutModal({ items, totalPrice, onClose }: Props) {
             {/* Botó enviar */}
             <button
               onClick={handleSubmit}
-              disabled={!form.name || !form.phone || !form.email || !paymentMethod || !selectedPickupPointId || submitOrderMutation.isPending || createCheckoutSessionMutation.isPending}
+              disabled={
+                !form.name ||
+                !form.phone ||
+                !form.email ||
+                !paymentMethod ||
+                (deliveryMethod === "pickup" && !selectedPickupPointId) ||
+                (deliveryMethod === "home" && (!shippingAddress || !shippingCity || !shippingPostalCode)) ||
+                submitOrderMutation.isPending ||
+                createCheckoutSessionMutation.isPending
+              }
               className="w-full btn-primary py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submitOrderMutation.isPending || createCheckoutSessionMutation.isPending ? (
@@ -341,6 +444,9 @@ export default function CheckoutModal({ items, totalPrice, onClose }: Props) {
               </p>
               <p className="text-xs text-[oklch(0.6_0.04_55)]">
                 Rebràs un correu de confirmació automàtic amb els detalls de la comanda.
+              </p>
+              <p className="text-xs text-[oklch(0.6_0.04_55)]">
+                El pagament es gestiona a través del nostre compte.
               </p>
             </div>
           </div>
