@@ -1086,7 +1086,7 @@ function ContactSection() {
   const inputStyle = { fontFamily: "'Nunito', sans-serif", border: "2px solid oklch(0.88 0.06 75)", background: "white", color: "oklch(0.3 0.06 50)" };
 
   return (
-    <section className="py-16 px-4" style={{ background: "oklch(0.96 0.03 80)" }}>
+    <section id="contacte" className="py-16 px-4" style={{ background: "oklch(0.96 0.03 80)" }}>
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-10">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-full mb-4"
@@ -1099,6 +1099,10 @@ function ContactSection() {
           <p className="text-base" style={{ color: "oklch(0.5 0.05 55)", fontFamily: "'Nunito', sans-serif" }}>
             Tens alguna pregunta sobre el projecte, vols col·laborar o organitzar una activitat?
           </p>
+          <a href="mailto:escoltem@elmardinsmeu.cat" className="inline-block mt-2 font-bold text-base"
+            style={{ color: "oklch(0.45 0.1 200)", fontFamily: "'Nunito', sans-serif" }}>
+            escoltem@elmardinsmeu.cat
+          </a>
         </div>
 
         <div className="bg-white rounded-2xl p-8 shadow-lg" style={{ border: "3px solid oklch(0.88 0.06 75)" }}>
@@ -1246,6 +1250,10 @@ export default function Home() {
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
   const [adminMenuOpen, setAdminMenuOpen] = useState(false);
+
+  function scrollToId(id: string) {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
   return (
     <div className="min-h-screen" style={{ background: "oklch(0.72 0.08 200)" }}>
@@ -1437,14 +1445,14 @@ export default function Home() {
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <button
-                onClick={() => window.scrollTo({ top: 1400, behavior: "smooth" })}
+                onClick={() => scrollToId("samarretes")}
                 className="px-6 py-3 rounded-xl font-bold text-white"
                 style={{ background: "oklch(0.55 0.1 200)", fontFamily: "'Nunito', sans-serif" }}
               >
                 Comprar samarreta
               </button>
               <button
-                onClick={() => window.scrollTo({ top: 900, behavior: "smooth" })}
+                onClick={() => scrollToId("participa")}
                 className="px-6 py-3 rounded-xl font-bold"
                 style={{ background: "oklch(0.88 0.06 75)", color: "oklch(0.35 0.07 55)", fontFamily: "'Nunito', sans-serif" }}
               >
@@ -1472,7 +1480,7 @@ export default function Home() {
       </section>
 
       {/* ===== COM FORMAR PART DEL PROJECTE ===== */}
-      <section className="py-12" style={{ background: "oklch(0.98 0.01 75)" }}>
+      <section id="participa" className="py-12" style={{ background: "oklch(0.98 0.01 75)" }}>
         <div className="container">
           <h3 className="text-center font-black text-3xl mb-8"
             style={{ fontFamily: "'Playfair Display', serif", color: "oklch(0.3 0.06 50)" }}>
@@ -1483,18 +1491,22 @@ export default function Home() {
               {
                 title: "Samarretes",
                 text: "Compra una samarreta i ajuda a fer créixer el projecte i a fer visible una realitat sovint silenciada.",
+                targetId: "samarretes",
               },
               {
                 title: "Conte 'El mar dins meu'",
                 text: "Un àlbum il·lustrat per parlar, posar paraules i obrir espais de consciència sobre l'abús sexual infantil.",
+                targetId: "conte",
               },
               {
                 title: "Xerrades i tallers",
                 text: "Organitzem xerrades, tallers i espais de diàleg per sensibilitzar i prevenir l'abús sexual infantil.",
+                targetId: "xerrades",
               },
             ].map((item) => (
-              <div key={item.title} className="rounded-2xl p-6 bg-white"
-                style={{ border: "2px solid oklch(0.88 0.06 75)" }}>
+              <div key={item.title} className="rounded-2xl p-6 bg-white cursor-pointer hover:shadow-md transition-shadow"
+                style={{ border: "2px solid oklch(0.88 0.06 75)" }}
+                onClick={() => scrollToId(item.targetId)}>
                 <h4 className="font-black text-xl mb-3"
                   style={{ fontFamily: "'Playfair Display', serif", color: "oklch(0.35 0.07 55)" }}>
                   {item.title}
@@ -1512,7 +1524,7 @@ export default function Home() {
               Vols portar el projecte al teu espai?
             </p>
             <button
-              onClick={() => window.scrollTo({ top: 5200, behavior: "smooth" })}
+              onClick={() => scrollToId("contacte")}
               className="px-6 py-3 rounded-xl font-bold text-white"
               style={{ background: "oklch(0.55 0.1 200)", fontFamily: "'Nunito', sans-serif" }}
             >
@@ -1523,12 +1535,14 @@ export default function Home() {
       </section>
 
       {/* ===== EL LLIBRE ===== */}
-      <BookSection />
-      <ReviewsSection />
-      <EcoDelSilenciSection />
-      
+      <div id="conte">
+        <BookSection />
+        <ReviewsSection />
+        <EcoDelSilenciSection />
+      </div>
+
       {/* ===== RESSENYES DE TALLERS I XERRADES ===== */}
-      <section className="py-14" style={{ background: "oklch(0.96 0.03 75)" }}>
+      <section id="xerrades" className="py-14" style={{ background: "oklch(0.96 0.03 75)" }}>
         <div className="container">
           <div className="text-center mb-10">
             <h2 className="font-black text-3xl sm:text-4xl mb-2"
@@ -1549,7 +1563,7 @@ export default function Home() {
       </section>
 
       {/* ===== CATÀLEG SAMARRETES ===== */}
-      <main className="container py-10">
+      <main id="samarretes" className="container py-10">
         <div className="text-center mb-10">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-4 font-bold text-sm"
             style={{ background: "oklch(0.75 0.18 55)", color: "white", fontFamily: "'Nunito', sans-serif" }}>
@@ -1565,14 +1579,14 @@ export default function Home() {
           </p>
           <div className="mt-5 flex flex-wrap justify-center gap-3">
             <button
-              onClick={() => window.scrollTo({ top: 1400, behavior: "smooth" })}
+              onClick={() => scrollToId("samarretes")}
               className="px-6 py-3 rounded-xl font-bold text-white"
               style={{ background: "oklch(0.55 0.1 200)", fontFamily: "'Nunito', sans-serif" }}
             >
               Comprar samarreta
             </button>
             <button
-              onClick={() => window.scrollTo({ top: 900, behavior: "smooth" })}
+              onClick={() => scrollToId("participa")}
               className="px-6 py-3 rounded-xl font-bold"
               style={{ background: "oklch(0.88 0.06 75)", color: "oklch(0.35 0.07 55)", fontFamily: "'Nunito', sans-serif" }}
             >
