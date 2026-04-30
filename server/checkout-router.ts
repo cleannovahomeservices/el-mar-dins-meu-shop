@@ -50,7 +50,7 @@ export const checkoutRouter = router({
           customerEmail: input.customerEmail,
           customerPhone: "",
           itemsJson,
-          totalPrice: Math.round(totalPrice * 100),
+          totalPrice: Math.round(totalPrice),
           pickupPointId: input.pickupPointId || undefined,
           paymentMethod: "stripe",
           isPaid: 0,
