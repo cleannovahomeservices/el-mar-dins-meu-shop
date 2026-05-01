@@ -8,6 +8,7 @@ import { trpc } from "@/lib/trpc";
 interface OrderData {
   id: number;
   customerName: string;
+  customerPhone: string;
   customerEmail: string;
   itemsJson: string;
   totalPrice: number;
@@ -160,6 +161,9 @@ export default function OrderConfirmation() {
               <h4 className="font-semibold mb-2 text-foreground">Dades de Contacte</h4>
               <p className="text-sm text-muted-foreground">
                 <strong>Nom:</strong> {order.customerName}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                <strong>Telèfon:</strong> {order.customerPhone}
               </p>
               <p className="text-sm text-muted-foreground">
                 <strong>Email:</strong> {order.customerEmail}
