@@ -90,6 +90,7 @@ export default function CheckoutModal({ items, totalPrice, onClose }: Props) {
       createCheckoutSessionMutation.mutate({
         customerName: form.name,
         customerEmail: form.email,
+        customerPhone: form.phone,
         items: items.map(i => ({
           id: i.id,
           name: i.name,

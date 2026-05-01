@@ -267,7 +267,7 @@ export default function AdminOrders() {
   const [editingNotes, setEditingNotes] = useState<{ id: number; text: string } | null>(null);
   const [filterPaid, setFilterPaid] = useState<"all" | "paid" | "unpaid">("all");
   const [filterDelivered, setFilterDelivered] = useState<"all" | "delivered" | "pending">("all");
-  const [filterPayment, setFilterPayment] = useState<"all" | "transferencia" | "enmà">("all");
+  const [filterPayment, setFilterPayment] = useState<"all" | "transferencia" | "stripe">("all");
   const [search, setSearch] = useState("");
 
   const [isExporting, setIsExporting] = useState(false);
@@ -400,7 +400,7 @@ export default function AdminOrders() {
   };
 
   const paymentLabel = (method: string) =>
-    method === "transferencia" ? "Transferència" : "En mà";
+    method === "transferencia" ? "Transferència" : method === "stripe" ? "Stripe" : "En mà";
 
   const formatDate = (date: Date) =>
     new Date(date).toLocaleDateString("ca-ES", {
@@ -531,7 +531,7 @@ export default function AdminOrders() {
           >
             <option value="all">Totes les formes</option>
             <option value="transferencia">Transferència</option>
-            <option value="enmà">En mà</option>
+            <option value="stripe">Stripe</option>
           </select>
 
           <div className="ml-auto flex items-center gap-3">
@@ -649,8 +649,8 @@ export default function AdminOrders() {
                       <div className="flex items-center justify-end gap-1.5 mt-1 flex-wrap">
                         <span className="text-xs px-2 py-0.5 rounded-full font-semibold"
                           style={{
-                            background: order.paymentMethod === "transferencia" ? "oklch(0.72 0.08 200 / 0.15)" : "oklch(0.6 0.15 145 / 0.15)",
-                            color: order.paymentMethod === "transferencia" ? "oklch(0.45 0.1 200)" : "oklch(0.4 0.12 145)",
+                            background: order.paymentMethod === "transferencia" ? "oklch(0.72 0.08 200 / 0.15)" : order.paymentMethod === "stripe" ? "oklch(0.72 0.12 280 / 0.15)" : "oklch(0.6 0.15 145 / 0.15)",
+                            color: order.paymentMethod === "transferencia" ? "oklch(0.45 0.1 200)" : order.paymentMethod === "stripe" ? "oklch(0.4 0.12 280)" : "oklch(0.4 0.12 145)",
                             fontFamily: "'Nunito', sans-serif",
                           }}>
                           {paymentLabel(order.paymentMethod)}

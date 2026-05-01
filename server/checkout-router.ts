@@ -17,6 +17,7 @@ export const checkoutRouter = router({
       z.object({
         customerName: z.string().min(1, "Name is required"),
         customerEmail: z.string().email("Valid email is required"),
+        customerPhone: z.string().min(6).max(30).optional().default(""),
         items: z.array(
           z.object({
             id: z.string(),
@@ -48,7 +49,7 @@ export const checkoutRouter = router({
         const result = await createOrder({
           customerName: input.customerName,
           customerEmail: input.customerEmail,
-          customerPhone: "",
+          customerPhone: input.customerPhone,
           itemsJson,
           totalPrice: Math.round(totalPrice),
           pickupPointId: input.pickupPointId || undefined,
