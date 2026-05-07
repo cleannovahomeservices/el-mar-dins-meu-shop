@@ -81,7 +81,10 @@ export default function PickupPointsPage() {
                   {point.address && (
                     <div className="flex gap-3 mb-3 text-sm">
                       <MapPin size={18} style={{ color: "oklch(0.72 0.08 200)", flexShrink: 0 }} />
-                      <p style={{ color: "oklch(0.5 0.05 55)" }}>{point.address}</p>
+                      <div style={{ color: "oklch(0.5 0.05 55)" }}>
+                        <p>{point.address}</p>
+                        {point.city && <p>{point.postalCode} {point.city}</p>}
+                      </div>
                     </div>
                   )}
 

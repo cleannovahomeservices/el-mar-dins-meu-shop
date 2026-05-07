@@ -4,6 +4,9 @@ import { MapView } from "./Map";
 interface PickupPoint {
   id: number;
   name: string;
+  address: string;
+  city: string;
+  postalCode: string;
   latitude: string | number | null;
   longitude: string | number | null;
 }
@@ -19,41 +22,54 @@ export function PickupPointsMap({ pickupPoints, isLoading = false }: PickupPoint
   const handleMapReady = (map: google.maps.Map) => {
     mapRef.current = map;
 
-    // Filter points with coordinates
-    const pointsWithCoords = pickupPoints.filter(p => p.latitude && p.longitude);
-
-    if (pointsWithCoords.length === 0) {
-      // Default center to Barcelona if no coordinates available
+    if (pickupPoints.length === 0) {
       map.setCenter({ lat: 41.3851, lng: 2.1734 });
       map.setZoom(8);
       return;
     }
 
-    // Create markers for each pickup point
-    pointsWithCoords.forEach((point) => {
-      const lat = typeof point.latitude === 'string' ? parseFloat(point.latitude) : Number(point.latitude);
-      const lng = typeof point.longitude === 'string' ? parseFloat(point.longitude) : Number(point.longitude);
+    const bounds = new window.google.maps.LatLngBounds();
+    let hasBounds = false;
+
+    const addMarker = (lat: number, lng: number, title: string) => {
+      new window.google.maps.marker.AdvancedMarkerElement({
+        map,
+        position: { lat, lng },
+        title,
+      });
+      bounds.extend({ lat, lng });
+      hasBounds = true;
+      map.fitBounds(bounds);
+    };
+
+    const geocoder = new window.google.maps.Geocoder();
+    let needsGeocode = false;
+
+    pickupPoints.forEach((point) => {
+      const lat = point.latitude != null
+        ? (typeof point.latitude === "string" ? parseFloat(point.latitude) : Number(point.latitude))
+        : NaN;
+      const lng = point.longitude != null
+        ? (typeof point.longitude === "string" ? parseFloat(point.longitude) : Number(point.longitude))
+        : NaN;
 
       if (!isNaN(lat) && !isNaN(lng)) {
-        new window.google.maps.marker.AdvancedMarkerElement({
-          map,
-          position: { lat, lng },
-          title: point.name,
+        addMarker(lat, lng, point.name);
+      } else {
+        needsGeocode = true;
+        const address = `${point.address}, ${point.city}, Spain`;
+        geocoder.geocode({ address }, (results, status) => {
+          if (status === "OK" && results?.[0]) {
+            const loc = results[0].geometry.location;
+            addMarker(loc.lat(), loc.lng(), point.name);
+          }
         });
       }
     });
 
-    // Fit map to show all markers
-    if (pointsWithCoords.length > 0) {
-      const bounds = new window.google.maps.LatLngBounds();
-      pointsWithCoords.forEach((point) => {
-        const lat = typeof point.latitude === 'string' ? parseFloat(point.latitude) : Number(point.latitude);
-        const lng = typeof point.longitude === 'string' ? parseFloat(point.longitude) : Number(point.longitude);
-        if (!isNaN(lat) && !isNaN(lng)) {
-          bounds.extend({ lat, lng });
-        }
-      });
-      map.fitBounds(bounds);
+    if (!hasBounds) {
+      map.setCenter({ lat: 41.3851, lng: 2.1734 });
+      map.setZoom(needsGeocode ? 8 : 10);
     }
   };
 
