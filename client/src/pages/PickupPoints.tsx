@@ -1,7 +1,6 @@
 import { trpc } from "@/lib/trpc";
 import { MapPin, Phone, Clock, Mail, MessageCircle, Globe, ExternalLink } from "lucide-react";
 import { Link } from "wouter";
-import { PickupPointsMap } from "@/components/PickupPointsMap";
 import { PickupPointsLoadingSkeleton } from "@/components/PickupPointsLoadingSkeleton";
 
 const TYPE_CONFIG = {
@@ -59,14 +58,6 @@ export default function PickupPointsPage() {
           </div>
         ) : (
           <>
-            {/* Mapa interactiu */}
-            <div className="mb-12">
-              <h2 className="text-2xl font-black mb-4" style={{ fontFamily: "'Playfair Display', serif", color: "oklch(0.30 0.06 50)" }}>
-                Ubicacions dels punts de recollida
-              </h2>
-              <PickupPointsMap pickupPoints={pickupPoints} isLoading={isLoading} />
-            </div>
-
             {/* Grid de targes */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {pickupPoints.map((point) => {
@@ -110,10 +101,24 @@ export default function PickupPointsPage() {
                       {/* Adreça + link mapes */}
                       <div className="flex gap-3 text-sm">
                         <MapPin size={16} style={{ color: typeConf.accent, flexShrink: 0, marginTop: 2 }} />
-                        <div className="flex-1">
-                          <p style={{ color: "oklch(0.40 0.05 55)" }}>{point.address}</p>
+                        <div className="flex-1 min-w-0">
+                          <p
+                            className="leading-snug"
+                            style={{
+                              color: "oklch(0.40 0.05 55)",
+                              display: "-webkit-box",
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: "vertical",
+                              overflow: "hidden",
+                            }}
+                            title={point.address}
+                          >
+                            {point.address}
+                          </p>
                           {point.city && (
-                            <p style={{ color: "oklch(0.55 0.04 55)" }}>{point.postalCode} {point.city}</p>
+                            <p className="mt-0.5" style={{ color: "oklch(0.55 0.04 55)" }}>
+                              {point.postalCode} {point.city}
+                            </p>
                           )}
                           <a
                             href={mapsUrl}
