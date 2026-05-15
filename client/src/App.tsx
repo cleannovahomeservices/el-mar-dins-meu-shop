@@ -11,6 +11,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { CartProvider } from "./contexts/CartContext";
 import Home from "./pages/Home";
+import Samarretes from "./pages/Samarretes";
 import Contact from "./pages/Contact";
 import AdminReviews from "./pages/AdminReviews";
 import AdminOrders from "./pages/AdminOrders";
@@ -29,6 +30,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/samarretes" component={Samarretes} />
       <Route path="/login" component={Login} />
       <Route path="/contacte" component={Contact} />
       <Route path="/punts-recollida" component={PickupPointsPage} />
