@@ -65,7 +65,7 @@ export default function CheckoutModal({ items, totalPrice, onClose }: Props) {
     },
   });
 
-  const shippingCost = deliveryMethod === "home" ? (totalPrice >= 50 ? 0 : 5) : 0;
+  const shippingCost = deliveryMethod === "home" ? 5 : 0;
   const totalWithShipping = totalPrice + shippingCost;
 
   const handleSubmit = () => {
@@ -294,7 +294,7 @@ export default function CheckoutModal({ items, totalPrice, onClose }: Props) {
                   <Truck size={22} className="text-[oklch(0.55_0.1_200)]" />
                   <div className="flex-1">
                     <div className="font-bold text-[oklch(0.3_0.06_50)] text-sm">Enviament a domicili</div>
-                    <div className="text-xs text-[oklch(0.55_0.04_55)]">5€ · Gratuït a partir de 50€</div>
+                    <div className="text-xs text-[oklch(0.55_0.04_55)]">5€ de costos d'enviament</div>
                   </div>
                 </button>
                 <button
