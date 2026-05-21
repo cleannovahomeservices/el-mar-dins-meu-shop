@@ -18,6 +18,7 @@ import {
   getApprovedPickupPoints,
   getAllPickupPoints,
   updatePickupPointStatus,
+  updatePickupPoint,
   deletePickupPoint,
   createWorkshopReview,
   getApprovedWorkshopReviews,
@@ -69,7 +70,7 @@ export const appRouter = router({
             size: z.string(),
             quantity: z.number().int().positive(),
             price: z.number().positive(),
-          })),
+          })).min(1, "La cistella no pot estar buida"),
           totalPrice: z.number().positive(),
         })
       )
@@ -540,7 +541,15 @@ export const appRouter = router({
           email: z.string().email(),
           contactPerson: z.string().min(2).max(128),
           description: z.string().max(500).optional(),
-          website: z.string().url().optional(),
+          website: z.preprocess(
+            (val) => {
+              if (typeof val !== "string") return val;
+              const trimmed = val.trim();
+              if (!trimmed) return undefined;
+              return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+            },
+            z.string().url().optional()
+          ),
           openingHours: z.string().max(256).optional(),
         })
       )
@@ -561,11 +570,8 @@ export const appRouter = router({
           console.log(`✅ Geocoded ${input.name}: ${latitude}, ${longitude}`);
         } catch (error) {
           const errorMsg = error instanceof Error ? error.message : String(error);
-          console.error(`❌ Geocoding failed for ${input.name}: ${errorMsg}`);
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: `No s'ha pogut geocodificar l'adreça. ${errorMsg}. Verifica que l'adreça sigui correcta.`,
-          });
+          console.warn(`⚠️ Geocoding failed for ${input.name}, saving without coordinates: ${errorMsg}`);
+          // Geocoding failure does not block registration; admin can review later
         }
         
         await createPickupPoint({
@@ -609,6 +615,38 @@ export const appRouter = router({
       )
       .mutation(async ({ input }) => {
         await updatePickupPointStatus(input.id, input.status);
+        return { success: true };
+      }),
+    // Admin: editar les dades d'un punt de recollida
+    update: adminProcedure
+      .input(
+        z.object({
+          id: z.number().int(),
+          name: z.string().min(2).max(128).optional(),
+          type: z.enum(["entitat", "associacio", "botiga", "altra"]).optional(),
+          address: z.string().min(5).max(256).optional(),
+          city: z.string().min(2).max(128).optional(),
+          postalCode: z.string().min(3).max(10).optional(),
+          phone: z.string().min(6).max(30).optional(),
+          email: z.string().email().optional(),
+          contactPerson: z.string().min(2).max(128).optional(),
+          description: z.string().max(500).nullable().optional(),
+          website: z.preprocess(
+            (val) => {
+              if (val === null || val === undefined) return val;
+              if (typeof val !== "string") return val;
+              const trimmed = val.trim();
+              if (!trimmed) return null;
+              return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+            },
+            z.string().url().nullable().optional()
+          ),
+          openingHours: z.string().max(256).nullable().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { id, ...data } = input;
+        await updatePickupPoint(id, data);
         return { success: true };
       }),
     // Admin: eliminar un punt de recollida
