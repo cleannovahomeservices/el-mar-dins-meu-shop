@@ -15,7 +15,8 @@ export async function getDb() {
         ssl: { rejectUnauthorized: false },
         waitForConnections: true,
         connectionLimit: 5,
-        connectTimeout: 10000,
+        connectTimeout: 20000,
+        acquireTimeout: 20000,
       });
       _db = drizzle(pool);
     } catch (error) {
@@ -192,6 +193,12 @@ export async function updatePickupPointStatus(id: number, status: "pending" | "a
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   return db.update(pickupPoints).set({ status }).where(eq(pickupPoints.id, id));
+}
+
+export async function updatePickupPoint(id: number, data: Partial<Omit<InsertPickupPoint, "id" | "createdAt">>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.update(pickupPoints).set(data).where(eq(pickupPoints.id, id));
 }
 
 export async function deletePickupPoint(id: number) {
