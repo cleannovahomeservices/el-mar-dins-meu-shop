@@ -6,8 +6,9 @@
 
 import { useState, useRef } from "react";
 import { Link } from "wouter";
-import { ShoppingBag, ChevronDown, ChevronUp } from "lucide-react";
+import { ShoppingBag, ChevronDown, ChevronUp, LayoutGrid, Package, Star, MapPin } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/_core/hooks/useAuth";
 import CartDrawer from "@/components/CartDrawer";
 import ProductCard, { Product } from "@/components/ProductCard";
 
@@ -410,6 +411,9 @@ function SizeGuideSection() {
 // ── Pàgina principal ──────────────────────────────────────────
 export default function Samarretes() {
   const { openCart, totalItems } = useCart();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
+  const [adminMenuOpen, setAdminMenuOpen] = useState(false);
 
   return (
     <div className="min-h-screen" style={{ background: "oklch(0.72 0.08 200)" }}>
@@ -435,23 +439,134 @@ export default function Samarretes() {
             </div>
           </div>
 
-          {/* Botó cistella */}
-          <button onClick={openCart}
-            className="relative flex items-center gap-2 px-4 py-2 rounded-full font-bold text-sm transition-all hover:scale-105"
-            style={{
-              background: "oklch(0.88 0.06 75)",
-              color: "oklch(0.35 0.07 55)",
-              fontFamily: "'Nunito', sans-serif",
-            }}>
-            <ShoppingBag size={18} />
-            <span className="hidden sm:inline">Cistella</span>
-            {totalItems > 0 && (
-              <span className="absolute -top-2 -right-2 w-5 h-5 rounded-full text-white text-xs font-bold flex items-center justify-center"
-                style={{ background: "oklch(0.45 0.1 200)" }}>
-                {totalItems}
-              </span>
+          <div className="flex items-center gap-2">
+            {/* Menú d'administració — visible només per a l'admin */}
+            {isAdmin && (
+              <div className="relative">
+                <button
+                  onClick={() => setAdminMenuOpen(prev => !prev)}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-full font-bold text-sm transition-all hover:scale-105"
+                  style={{
+                    background: "oklch(0.45 0.1 200 / 0.7)",
+                    color: "white",
+                    fontFamily: "'Nunito', sans-serif",
+                    border: "2px solid rgba(255,255,255,0.25)",
+                  }}
+                  title="Panell d'administració"
+                >
+                  <LayoutGrid size={15} />
+                  <span className="hidden sm:inline text-xs">Admin</span>
+                </button>
+
+                {adminMenuOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-40"
+                      onClick={() => setAdminMenuOpen(false)}
+                    />
+                    <div
+                      className="absolute right-0 top-full mt-2 z-50 rounded-2xl overflow-hidden shadow-xl"
+                      style={{
+                        background: "white",
+                        border: "2px solid oklch(0.88 0.04 75)",
+                        minWidth: "200px",
+                      }}
+                    >
+                      <div
+                        className="px-4 py-2 text-xs font-bold uppercase tracking-wide"
+                        style={{ color: "oklch(0.6 0.04 55)", fontFamily: "'Nunito', sans-serif", borderBottom: "1px solid oklch(0.92 0.02 75)" }}
+                      >
+                        Administració
+                      </div>
+                      <Link href="/admin/comandes" onClick={() => setAdminMenuOpen(false)}>
+                        <div className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors"
+                          style={{ fontFamily: "'Nunito', sans-serif" }}>
+                          <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+                            style={{ background: "oklch(0.72 0.08 200 / 0.15)" }}>
+                            <Package size={15} style={{ color: "oklch(0.45 0.1 200)" }} />
+                          </div>
+                          <div>
+                            <p className="font-bold text-sm" style={{ color: "oklch(0.3 0.05 55)" }}>Comandes</p>
+                            <p className="text-xs" style={{ color: "oklch(0.6 0.04 55)" }}>Gestiona les comandes</p>
+                          </div>
+                        </div>
+                      </Link>
+                      <Link href="/admin/ressenyes" onClick={() => setAdminMenuOpen(false)}>
+                        <div className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors"
+                          style={{ fontFamily: "'Nunito', sans-serif", borderTop: "1px solid oklch(0.94 0.02 75)" }}>
+                          <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+                            style={{ background: "oklch(0.6 0.15 145 / 0.12)" }}>
+                            <Star size={15} style={{ color: "oklch(0.4 0.12 145)" }} />
+                          </div>
+                          <div>
+                            <p className="font-bold text-sm" style={{ color: "oklch(0.3 0.05 55)" }}>Ressenyes del llibre</p>
+                            <p className="text-xs" style={{ color: "oklch(0.6 0.04 55)" }}>Modera les ressenyes</p>
+                          </div>
+                        </div>
+                      </Link>
+                      <Link href="/admin/ressenyes-tallers" onClick={() => setAdminMenuOpen(false)}>
+                        <div className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors"
+                          style={{ fontFamily: "'Nunito', sans-serif", borderTop: "1px solid oklch(0.94 0.02 75)" }}>
+                          <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+                            style={{ background: "oklch(0.6 0.15 145 / 0.12)" }}>
+                            <Star size={15} style={{ color: "oklch(0.4 0.12 145)" }} />
+                          </div>
+                          <div>
+                            <p className="font-bold text-sm" style={{ color: "oklch(0.3 0.05 55)" }}>Ressenyes de tallers</p>
+                            <p className="text-xs" style={{ color: "oklch(0.6 0.04 55)" }}>Modera les ressenyes de tallers</p>
+                          </div>
+                        </div>
+                      </Link>
+                      <Link href="/admin/punts-recollida" onClick={() => setAdminMenuOpen(false)}>
+                        <div className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors"
+                          style={{ fontFamily: "'Nunito', sans-serif", borderTop: "1px solid oklch(0.94 0.02 75)" }}>
+                          <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+                            style={{ background: "oklch(0.72 0.08 200 / 0.15)" }}>
+                            <MapPin size={15} style={{ color: "oklch(0.45 0.1 200)" }} />
+                          </div>
+                          <div>
+                            <p className="font-bold text-sm" style={{ color: "oklch(0.3 0.05 55)" }}>Punts de recollida</p>
+                            <p className="text-xs" style={{ color: "oklch(0.6 0.04 55)" }}>Gestiona els punts de recollida</p>
+                          </div>
+                        </div>
+                      </Link>
+                      <Link href="/admin/analitiques" onClick={() => setAdminMenuOpen(false)}>
+                        <div className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors"
+                          style={{ fontFamily: "'Nunito', sans-serif", borderTop: "1px solid oklch(0.94 0.02 75)" }}>
+                          <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+                            style={{ background: "oklch(0.72 0.08 200 / 0.15)" }}>
+                            <LayoutGrid size={15} style={{ color: "oklch(0.45 0.1 200)" }} />
+                          </div>
+                          <div>
+                            <p className="font-bold text-sm" style={{ color: "oklch(0.3 0.05 55)" }}>Analítiques</p>
+                            <p className="text-xs" style={{ color: "oklch(0.6 0.04 55)" }}>Veu les estadístiques de vendes</p>
+                          </div>
+                        </div>
+                      </Link>
+                    </div>
+                  </>
+                )}
+              </div>
             )}
-          </button>
+
+            {/* Botó cistella */}
+            <button onClick={openCart}
+              className="relative flex items-center gap-2 px-4 py-2 rounded-full font-bold text-sm transition-all hover:scale-105"
+              style={{
+                background: "oklch(0.88 0.06 75)",
+                color: "oklch(0.35 0.07 55)",
+                fontFamily: "'Nunito', sans-serif",
+              }}>
+              <ShoppingBag size={18} />
+              <span className="hidden sm:inline">Cistella</span>
+              {totalItems > 0 && (
+                <span className="absolute -top-2 -right-2 w-5 h-5 rounded-full text-white text-xs font-bold flex items-center justify-center"
+                  style={{ background: "oklch(0.45 0.1 200)" }}>
+                  {totalItems}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
       </header>
 

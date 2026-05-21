@@ -8,7 +8,7 @@ import { useState, useEffect, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { Link } from "wouter";
-import { ShoppingBag, Instagram, Mail, ChevronDown, ChevronUp, BookOpen, ExternalLink, Heart, Send, CheckCircle, LayoutGrid, Package, Star } from "lucide-react";
+import { ShoppingBag, Instagram, Mail, ChevronDown, ChevronUp, BookOpen, ExternalLink, Heart, Send, CheckCircle, LayoutGrid, Package, Star, MapPin } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import CartDrawer from "@/components/CartDrawer";
 import ProductCard, { Product } from "@/components/ProductCard";
@@ -1382,6 +1382,21 @@ export default function Home() {
                           <div>
                             <p className="font-bold text-sm" style={{ color: "oklch(0.3 0.05 55)" }}>Ressenyes de tallers</p>
                             <p className="text-xs" style={{ color: "oklch(0.6 0.04 55)" }}>Modera les ressenyes de tallers</p>
+                          </div>
+                        </div>
+                      </Link>
+                      <Link href="/admin/punts-recollida" onClick={() => setAdminMenuOpen(false)}>
+                        <div
+                          className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors"
+                          style={{ fontFamily: "'Nunito', sans-serif", borderTop: "1px solid oklch(0.94 0.02 75)" }}
+                        >
+                          <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+                            style={{ background: "oklch(0.72 0.08 200 / 0.15)" }}>
+                            <MapPin size={15} style={{ color: "oklch(0.45 0.1 200)" }} />
+                          </div>
+                          <div>
+                            <p className="font-bold text-sm" style={{ color: "oklch(0.3 0.05 55)" }}>Punts de recollida</p>
+                            <p className="text-xs" style={{ color: "oklch(0.6 0.04 55)" }}>Gestiona els punts de recollida</p>
                           </div>
                         </div>
                       </Link>
