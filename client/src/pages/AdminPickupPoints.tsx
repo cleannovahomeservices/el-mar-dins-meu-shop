@@ -3,17 +3,52 @@ import { trpc } from "@/lib/trpc";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Trash2, Check, X } from "lucide-react";
+import { Trash2, Check, X, Pencil } from "lucide-react";
+
+type PickupPoint = {
+  id: number;
+  name: string;
+  type: string;
+  address: string;
+  city: string;
+  postalCode: string;
+  phone: string;
+  email: string;
+  contactPerson: string;
+  description?: string | null;
+  website?: string | null;
+  openingHours?: string | null;
+  status: string;
+  latitude?: string | null;
+  longitude?: string | null;
+};
+
+type EditForm = Omit<PickupPoint, "id" | "status" | "latitude" | "longitude">;
 
 export default function AdminPickupPoints() {
   const [selectedStatus, setSelectedStatus] = useState<"all" | "pending" | "approved" | "rejected">("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [editingPoint, setEditingPoint] = useState<PickupPoint | null>(null);
+  const [editForm, setEditForm] = useState<EditForm | null>(null);
 
   const { data: allPoints = [], isLoading, refetch } = trpc.pickupPoints.listAll.useQuery();
   const moderateMutation = trpc.pickupPoints.moderate.useMutation({
     onSuccess: () => {
       toast.success("Estat actualitzat");
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(`Error: ${error.message}`);
+    },
+  });
+
+  const updateMutation = trpc.pickupPoints.update.useMutation({
+    onSuccess: () => {
+      toast.success("Punt de recollida actualitzat");
+      setEditingPoint(null);
+      setEditForm(null);
       refetch();
     },
     onError: (error) => {
@@ -31,7 +66,7 @@ export default function AdminPickupPoints() {
     },
   });
 
-  const filteredPoints = allPoints.filter((point: any) => {
+  const filteredPoints = (allPoints as PickupPoint[]).filter((point) => {
     const matchesStatus = selectedStatus === "all" || point.status === selectedStatus;
     const matchesSearch =
       point.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -42,10 +77,43 @@ export default function AdminPickupPoints() {
 
   const stats = {
     total: allPoints.length,
-    pending: allPoints.filter((p: any) => p.status === "pending").length,
-    approved: allPoints.filter((p: any) => p.status === "approved").length,
-    rejected: allPoints.filter((p: any) => p.status === "rejected").length,
+    pending: (allPoints as PickupPoint[]).filter((p) => p.status === "pending").length,
+    approved: (allPoints as PickupPoint[]).filter((p) => p.status === "approved").length,
+    rejected: (allPoints as PickupPoint[]).filter((p) => p.status === "rejected").length,
   };
+
+  function openEdit(point: PickupPoint) {
+    setEditingPoint(point);
+    setEditForm({
+      name: point.name,
+      type: point.type as EditForm["type"],
+      address: point.address,
+      city: point.city,
+      postalCode: point.postalCode,
+      phone: point.phone,
+      email: point.email,
+      contactPerson: point.contactPerson,
+      description: point.description ?? "",
+      website: point.website ?? "",
+      openingHours: point.openingHours ?? "",
+    });
+  }
+
+  function handleEditChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
+    const { name, value } = e.target;
+    setEditForm((prev) => prev ? { ...prev, [name]: value } : prev);
+  }
+
+  function handleEditSave() {
+    if (!editingPoint || !editForm) return;
+    updateMutation.mutate({
+      id: editingPoint.id,
+      ...editForm,
+      description: editForm.description || null,
+      website: editForm.website || null,
+      openingHours: editForm.openingHours || null,
+    });
+  }
 
   return (
     <DashboardLayout>
@@ -118,9 +186,14 @@ export default function AdminPickupPoints() {
                   </tr>
                 </thead>
                 <tbody className="divide-y">
-                  {filteredPoints.map((point: any) => (
+                  {filteredPoints.map((point) => (
                     <tr key={point.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 text-sm font-medium">{point.name}</td>
+                      <td className="px-6 py-4 text-sm font-medium">
+                        {point.name}
+                        {!point.latitude && (
+                          <span className="ml-2 text-xs text-orange-500" title="Sense coordenades GPS">⚠️</span>
+                        )}
+                      </td>
                       <td className="px-6 py-4 text-sm capitalize">{point.type}</td>
                       <td className="px-6 py-4 text-sm">{point.city}</td>
                       <td className="px-6 py-4 text-sm">{point.contactPerson}</td>
@@ -140,6 +213,14 @@ export default function AdminPickupPoints() {
                       </td>
                       <td className="px-6 py-4 text-sm">
                         <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => openEdit(point)}
+                            title="Editar"
+                          >
+                            <Pencil size={16} />
+                          </Button>
                           {point.status !== "approved" && (
                             <Button
                               size="sm"
@@ -185,7 +266,7 @@ export default function AdminPickupPoints() {
         {filteredPoints.length > 0 && (
           <div className="space-y-4">
             <h2 className="text-lg font-semibold">Detalls dels punts de recollida</h2>
-            {filteredPoints.map((point: any) => (
+            {filteredPoints.map((point) => (
               <div key={point.id} className="bg-white p-6 rounded-lg border">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -234,12 +315,99 @@ export default function AdminPickupPoints() {
                       </a>
                     </div>
                   )}
+                  {!point.latitude && (
+                    <div className="col-span-2 bg-orange-50 border border-orange-200 rounded p-3 text-sm text-orange-700">
+                      ⚠️ Sense coordenades GPS — la geocodificació va fallar en el registre. Pots editar l'adreça per intentar-ho de nou o assignar-les manualment.
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {/* Modal d'edició */}
+      {editingPoint && editForm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b">
+              <h2 className="text-xl font-bold">Editar punt de recollida</h2>
+              <p className="text-sm text-gray-500 mt-1">{editingPoint.name}</p>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2">
+                  <label className="block text-sm font-semibold mb-1">Nom</label>
+                  <Input name="name" value={editForm.name} onChange={handleEditChange} />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-1">Tipus</label>
+                  <select
+                    name="type"
+                    value={editForm.type}
+                    onChange={handleEditChange}
+                    className="w-full px-3 py-2 border rounded-lg text-sm"
+                  >
+                    <option value="botiga">Botiga</option>
+                    <option value="entitat">Entitat</option>
+                    <option value="associacio">Associació</option>
+                    <option value="altra">Altra</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-1">Telèfon</label>
+                  <Input name="phone" value={editForm.phone} onChange={handleEditChange} />
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-sm font-semibold mb-1">Adreça</label>
+                  <Input name="address" value={editForm.address} onChange={handleEditChange} />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-1">Ciutat</label>
+                  <Input name="city" value={editForm.city} onChange={handleEditChange} />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-1">Codi postal</label>
+                  <Input name="postalCode" value={editForm.postalCode} onChange={handleEditChange} />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-1">Email</label>
+                  <Input name="email" value={editForm.email} onChange={handleEditChange} />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-1">Persona de contacte</label>
+                  <Input name="contactPerson" value={editForm.contactPerson} onChange={handleEditChange} />
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-sm font-semibold mb-1">Horari d'atenció</label>
+                  <Input name="openingHours" value={editForm.openingHours ?? ""} onChange={handleEditChange} placeholder="Ex: Dilluns-Divendres 9-19h" />
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-sm font-semibold mb-1">Web</label>
+                  <Input name="website" value={editForm.website ?? ""} onChange={handleEditChange} placeholder="https://exemple.cat" />
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-sm font-semibold mb-1">Descripció</label>
+                  <Textarea name="description" value={editForm.description ?? ""} onChange={handleEditChange} rows={3} />
+                </div>
+              </div>
+            </div>
+            <div className="p-6 border-t flex gap-3 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => { setEditingPoint(null); setEditForm(null); }}
+                disabled={updateMutation.isPending}
+              >
+                Cancel·lar
+              </Button>
+              <Button onClick={handleEditSave} disabled={updateMutation.isPending}>
+                {updateMutation.isPending ? "Desant..." : "Desar canvis"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 }

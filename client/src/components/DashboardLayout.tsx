@@ -21,15 +21,18 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users } from "lucide-react";
+import { LayoutDashboard, LogOut, MapPin, PanelLeft, ShoppingBag, Star, BookOpen, BarChart2 } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Page 1", path: "/" },
-  { icon: Users, label: "Page 2", path: "/some-path" },
+  { icon: ShoppingBag, label: "Comandes", path: "/admin/comandes" },
+  { icon: MapPin, label: "Punts de recollida", path: "/admin/punts-recollida" },
+  { icon: Star, label: "Ressenyes", path: "/admin/ressenyes" },
+  { icon: BookOpen, label: "Ressenyes tallers", path: "/admin/ressenyes-tallers" },
+  { icon: BarChart2, label: "Analítiques", path: "/admin/analitiques" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
@@ -185,7 +188,7 @@ function DashboardLayoutContent({
               {!isCollapsed ? (
                 <div className="flex items-center gap-2 min-w-0">
                   <span className="font-semibold tracking-tight truncate">
-                    Navigation
+                    Admin
                   </span>
                 </div>
               ) : null}
