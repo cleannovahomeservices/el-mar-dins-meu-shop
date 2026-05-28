@@ -425,6 +425,15 @@ export default function AdminOrders() {
             </h1>
           </div>
           <div className="flex items-center gap-2">
+            <Link href="/admin/papelera-comandes">
+              <button
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all hover:bg-white/20"
+                style={{ fontFamily: "'Nunito', sans-serif" }}
+                title="Veure comandes esborrades"
+              >
+                <Trash2 size={14} /> Paperera
+              </button>
+            </Link>
             <button
               onClick={handleExportCSV}
               disabled={isExporting || !orders?.length}

@@ -7,7 +7,7 @@ import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { toast } from "sonner";
-import { CheckCircle, XCircle, Clock, Trash2, LogOut, ArrowLeft } from "lucide-react";
+import { CheckCircle, XCircle, Clock, Trash2, LogOut, ArrowLeft, Trash } from "lucide-react";
 import { Link } from "wouter";
 
 type ReviewStatus = "pending" | "approved" | "rejected";
@@ -110,6 +110,12 @@ export default function AdminReviews() {
             </h1>
           </div>
           <div className="flex items-center gap-3">
+            <Link href="/admin/papelera">
+              <button className="flex items-center gap-1.5 text-white/80 hover:text-white transition-colors text-sm font-semibold"
+                style={{ fontFamily: "'Nunito', sans-serif" }} title="Veure la paperera">
+                <Trash size={14} /> Paperera
+              </button>
+            </Link>
             <span className="text-white/70 text-sm hidden sm:block" style={{ fontFamily: "'Nunito', sans-serif" }}>
               {user?.name || "Admin"}
             </span>

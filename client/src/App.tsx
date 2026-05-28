@@ -24,7 +24,16 @@ import OrderConfirmation from "./pages/OrderConfirmation";
 import OrderHistory from "./pages/OrderHistory";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
 import AdminAnalytics from "./pages/AdminAnalytics";
+import AdminTrash from "./pages/AdminTrash";
 import Login from "./pages/Login";
+
+function AdminTrashOrders() {
+  return <AdminTrash onlyOrders />;
+}
+
+function AdminTrashAll() {
+  return <AdminTrash />;
+}
 
 function Router() {
   return (
@@ -44,6 +53,8 @@ function Router() {
       <Route path="/admin/comandes" component={AdminOrders} />
       <Route path="/admin/punts-recollida" component={AdminPickupPoints} />
       <Route path="/admin/analitiques" component={AdminAnalytics} />
+      <Route path="/admin/papelera-comandes" component={AdminTrashOrders} />
+      <Route path="/admin/papelera" component={AdminTrashAll} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

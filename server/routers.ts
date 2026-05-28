@@ -8,23 +8,35 @@ import {
   createReview,
   getApprovedReviews,
   getAllReviews,
+  getTrashedReviews,
   updateReviewStatus,
   deleteReview,
+  restoreReview,
+  hardDeleteReview,
   createOrder,
   getAllOrders,
+  getTrashedOrders,
   updateOrderStatus,
   deleteOrder,
+  restoreOrder,
+  hardDeleteOrder,
   createPickupPoint,
   getApprovedPickupPoints,
   getAllPickupPoints,
+  getTrashedPickupPoints,
   updatePickupPointStatus,
   updatePickupPoint,
   deletePickupPoint,
+  restorePickupPoint,
+  hardDeletePickupPoint,
   createWorkshopReview,
   getApprovedWorkshopReviews,
   getAllWorkshopReviews,
+  getTrashedWorkshopReviews,
   updateWorkshopReviewStatus,
   deleteWorkshopReview,
+  restoreWorkshopReview,
+  hardDeleteWorkshopReview,
 } from "./db";
 import { notifyOwner } from "./_core/notification";
 import { sendOrderEmail, sendClientConfirmationEmail, sendDeliveryEmail, sendPaymentReminderEmail, sendContactEmail, sendPaymentConfirmationEmail, sendOrderReadyEmail } from "./mailer";
@@ -209,11 +221,32 @@ export const appRouter = router({
         return { success: true };
       }),
 
-    // Admin: eliminar una comanda
+    // Admin: enviar una comanda a la paperera (soft-delete)
     delete: adminProcedure
       .input(z.object({ id: z.number().int() }))
       .mutation(async ({ input }) => {
         await deleteOrder(input.id);
+        return { success: true };
+      }),
+
+    // Admin: llistar comandes a la paperera
+    listTrashed: adminProcedure.query(async () => {
+      return getTrashedOrders();
+    }),
+
+    // Admin: recuperar una comanda de la paperera
+    restore: adminProcedure
+      .input(z.object({ id: z.number().int() }))
+      .mutation(async ({ input }) => {
+        await restoreOrder(input.id);
+        return { success: true };
+      }),
+
+    // Admin: eliminar definitivament una comanda
+    hardDelete: adminProcedure
+      .input(z.object({ id: z.number().int() }))
+      .mutation(async ({ input }) => {
+        await hardDeleteOrder(input.id);
         return { success: true };
       }),
 
@@ -517,11 +550,32 @@ export const appRouter = router({
         return { success: true };
       }),
 
-    // Admin: eliminar una ressenya
+    // Admin: enviar una ressenya a la paperera (soft-delete)
     delete: adminProcedure
       .input(z.object({ id: z.number().int() }))
       .mutation(async ({ input }) => {
         await deleteReview(input.id);
+        return { success: true };
+      }),
+
+    // Admin: llistar ressenyes a la paperera
+    listTrashed: adminProcedure.query(async () => {
+      return getTrashedReviews();
+    }),
+
+    // Admin: recuperar una ressenya de la paperera
+    restore: adminProcedure
+      .input(z.object({ id: z.number().int() }))
+      .mutation(async ({ input }) => {
+        await restoreReview(input.id);
+        return { success: true };
+      }),
+
+    // Admin: eliminar definitivament una ressenya
+    hardDelete: adminProcedure
+      .input(z.object({ id: z.number().int() }))
+      .mutation(async ({ input }) => {
+        await hardDeleteReview(input.id);
         return { success: true };
       }),
    }),
@@ -649,11 +703,32 @@ export const appRouter = router({
         await updatePickupPoint(id, data);
         return { success: true };
       }),
-    // Admin: eliminar un punt de recollida
+    // Admin: enviar un punt de recollida a la paperera (soft-delete)
     delete: adminProcedure
       .input(z.object({ id: z.number().int() }))
       .mutation(async ({ input }) => {
         await deletePickupPoint(input.id);
+        return { success: true };
+      }),
+
+    // Admin: llistar punts de recollida a la paperera
+    listTrashed: adminProcedure.query(async () => {
+      return getTrashedPickupPoints();
+    }),
+
+    // Admin: recuperar un punt de recollida de la paperera
+    restore: adminProcedure
+      .input(z.object({ id: z.number().int() }))
+      .mutation(async ({ input }) => {
+        await restorePickupPoint(input.id);
+        return { success: true };
+      }),
+
+    // Admin: eliminar definitivament un punt de recollida
+    hardDelete: adminProcedure
+      .input(z.object({ id: z.number().int() }))
+      .mutation(async ({ input }) => {
+        await hardDeletePickupPoint(input.id);
         return { success: true };
       }),
   }),
@@ -714,11 +789,32 @@ export const appRouter = router({
         return { success: true };
       }),
 
-    // Admin: eliminar una ressenya de taller
+    // Admin: enviar una ressenya de taller a la paperera (soft-delete)
     delete: adminProcedure
       .input(z.object({ id: z.number().int() }))
       .mutation(async ({ input }) => {
         await deleteWorkshopReview(input.id);
+        return { success: true };
+      }),
+
+    // Admin: llistar ressenyes de tallers a la paperera
+    listTrashed: adminProcedure.query(async () => {
+      return getTrashedWorkshopReviews();
+    }),
+
+    // Admin: recuperar una ressenya de taller de la paperera
+    restore: adminProcedure
+      .input(z.object({ id: z.number().int() }))
+      .mutation(async ({ input }) => {
+        await restoreWorkshopReview(input.id);
+        return { success: true };
+      }),
+
+    // Admin: eliminar definitivament una ressenya de taller
+    hardDelete: adminProcedure
+      .input(z.object({ id: z.number().int() }))
+      .mutation(async ({ input }) => {
+        await hardDeleteWorkshopReview(input.id);
         return { success: true };
       }),
   }),

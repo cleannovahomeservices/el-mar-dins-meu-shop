@@ -71,6 +71,13 @@
       "when": 1776177964741,
       "tag": "0009_skinny_zombie",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1779600000000,
+      "tag": "0010_papelera_soft_delete",
+      "breakpoints": true
     }
   ]
 }

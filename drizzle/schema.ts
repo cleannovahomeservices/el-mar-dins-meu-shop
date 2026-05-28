@@ -38,6 +38,8 @@ export const reviews = mysqlTable("reviews", {
   content: text("content").notNull(),
   /** Estat: pending (pendent de moderació), approved (publicada), rejected (rebutjada) */
   status: mysqlEnum("status", ["pending", "approved", "rejected"]).default("pending").notNull(),
+  /** Marca de soft-delete: si té valor, el registre està a la paperera */
+  deletedAt: timestamp("deletedAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -74,6 +76,8 @@ export const orders = mysqlTable("orders", {
   deliveryEmailSent: int("deliveryEmailSent").default(0).notNull(),
   /** Data i hora en què s'ha enviat l'últim recordatori de pagament */
   paymentReminderSentAt: timestamp("paymentReminderSentAt"),
+  /** Marca de soft-delete: si té valor, el registre està a la paperera */
+  deletedAt: timestamp("deletedAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -138,6 +142,8 @@ export const pickupPoints = mysqlTable("pickupPoints", {
   status: mysqlEnum("status", ["pending", "approved", "rejected"]).default("pending").notNull(),
   /** Notes internes de l'administrador */
   adminNotes: text("adminNotes"),
+  /** Marca de soft-delete: si té valor, el registre està a la paperera */
+  deletedAt: timestamp("deletedAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -162,6 +168,8 @@ export const workshopReviews = mysqlTable("workshopReviews", {
   content: text("content").notNull(),
   /** Estat: pending (pendent de moderació), approved (publicada), rejected (rebutjada) */
   status: mysqlEnum("status", ["pending", "approved", "rejected"]).default("pending").notNull(),
+  /** Marca de soft-delete: si té valor, el registre està a la paperera */
+  deletedAt: timestamp("deletedAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
