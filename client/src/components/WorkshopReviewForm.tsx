@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
 import { Star } from "lucide-react";
+import { toast } from "sonner";
 import { ThankYouAnimation } from "./ThankYouAnimation";
 
 export function WorkshopReviewForm() {
@@ -24,7 +25,7 @@ export function WorkshopReviewForm() {
         authorName: formData.authorName,
         email: formData.email || undefined,
         eventType: formData.eventType,
-        eventTitle: formData.eventTitle,
+        eventTitle: formData.eventTitle.trim() || undefined,
         rating: formData.rating,
         content: formData.content,
       });
@@ -40,6 +41,8 @@ export function WorkshopReviewForm() {
       setTimeout(() => setSubmitted(false), 5000);
     } catch (error) {
       console.error("Error submitting review:", error);
+      const msg = error instanceof Error ? error.message : "No s'ha pogut enviar la ressenya";
+      toast.error(msg);
     }
   };
 
