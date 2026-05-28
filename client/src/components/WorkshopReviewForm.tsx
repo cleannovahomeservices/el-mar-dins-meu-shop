@@ -5,6 +5,51 @@ import { Star } from "lucide-react";
 import { toast } from "sonner";
 import { ThankYouAnimation } from "./ThankYouAnimation";
 
+const FIELD_LABELS: Record<string, string> = {
+  authorName: "El nom",
+  email: "L'email",
+  eventType: "El tipus d'event",
+  eventTitle: "El títol",
+  rating: "La valoració",
+  content: "La teva opinió",
+};
+
+function formatZodIssue(issue: { code?: string; path?: (string | number)[]; minimum?: number; maximum?: number; message?: string }): string {
+  const fieldKey = Array.isArray(issue.path) && issue.path.length > 0 ? String(issue.path[0]) : "";
+  const label = FIELD_LABELS[fieldKey] || "El camp";
+  switch (issue.code) {
+    case "too_small":
+      return `${label} ha de tenir almenys ${issue.minimum} caràcters.`;
+    case "too_big":
+      return `${label} és massa llarga (màxim ${issue.maximum} caràcters).`;
+    case "invalid_type":
+      return `${label} és obligatori.`;
+    case "invalid_format":
+    case "invalid_string":
+      if (fieldKey === "email") return "L'email no és vàlid.";
+      return `${label} no té un format vàlid.`;
+    default:
+      return issue.message || `Revisa ${label.toLowerCase()}.`;
+  }
+}
+
+function humanizeError(error: unknown): string {
+  if (!(error instanceof Error)) return "No s'ha pogut enviar la ressenya.";
+  const msg = error.message || "";
+  // Els errors zod arriben com a JSON-string amb un array d'issues
+  if (msg.trim().startsWith("[")) {
+    try {
+      const issues = JSON.parse(msg) as Array<{ code?: string; path?: (string | number)[]; minimum?: number; maximum?: number; message?: string }>;
+      if (Array.isArray(issues) && issues.length > 0) {
+        return formatZodIssue(issues[0]);
+      }
+    } catch {
+      // ignora i cau al return general
+    }
+  }
+  return msg || "No s'ha pogut enviar la ressenya.";
+}
+
 export function WorkshopReviewForm() {
   const [formData, setFormData] = useState({
     authorName: "",
@@ -16,18 +61,35 @@ export function WorkshopReviewForm() {
   });
 
   const [submitted, setSubmitted] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<{ authorName?: string; content?: string }>({});
   const submitMutation = trpc.workshopReviews.submit.useMutation();
+
+  const validate = () => {
+    const errors: { authorName?: string; content?: string } = {};
+    if (formData.authorName.trim().length < 2) {
+      errors.authorName = "El nom ha de tenir almenys 2 caràcters.";
+    }
+    if (formData.content.trim().length < 10) {
+      errors.content = "La teva opinió ha de tenir almenys 10 caràcters.";
+    }
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validate()) {
+      toast.error("Revisa els camps marcats abans d'enviar.");
+      return;
+    }
     try {
       await submitMutation.mutateAsync({
-        authorName: formData.authorName,
-        email: formData.email || undefined,
+        authorName: formData.authorName.trim(),
+        email: formData.email.trim() || undefined,
         eventType: formData.eventType,
         eventTitle: formData.eventTitle.trim() || undefined,
         rating: formData.rating,
-        content: formData.content,
+        content: formData.content.trim(),
       });
       setSubmitted(true);
       setFormData({
@@ -38,11 +100,11 @@ export function WorkshopReviewForm() {
         rating: 5,
         content: "",
       });
+      setFieldErrors({});
       setTimeout(() => setSubmitted(false), 5000);
     } catch (error) {
       console.error("Error submitting review:", error);
-      const msg = error instanceof Error ? error.message : "No s'ha pogut enviar la ressenya";
-      toast.error(msg);
+      toast.error(humanizeError(error));
     }
   };
 
@@ -64,6 +126,11 @@ export function WorkshopReviewForm() {
     );
   }
 
+  const inputBorder = (hasError?: boolean) =>
+    `w-full px-4 py-2 rounded-lg border outline-none transition-colors ${
+      hasError ? "border-red-400 focus:border-red-500" : "focus:border-[oklch(0.72_0.08_200)]"
+    }`;
+
   return (
     <form onSubmit={handleSubmit} className="rounded-2xl p-6 space-y-4" style={{ background: "white", border: "2px solid oklch(0.78 0.07 70 / 0.5)" }}>
       <div>
@@ -74,10 +141,18 @@ export function WorkshopReviewForm() {
           type="text"
           required
           value={formData.authorName}
-          onChange={(e) => setFormData({ ...formData, authorName: e.target.value })}
-          className="w-full px-4 py-2 rounded-lg border"
+          onChange={(e) => {
+            setFormData({ ...formData, authorName: e.target.value });
+            if (fieldErrors.authorName) setFieldErrors({ ...fieldErrors, authorName: undefined });
+          }}
+          className={inputBorder(!!fieldErrors.authorName)}
           placeholder="Nom complet"
         />
+        {fieldErrors.authorName && (
+          <p className="text-xs mt-1 font-semibold" style={{ color: "oklch(0.55 0.18 25)" }}>
+            {fieldErrors.authorName}
+          </p>
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -89,7 +164,7 @@ export function WorkshopReviewForm() {
             required
             value={formData.eventType}
             onChange={(e) => setFormData({ ...formData, eventType: e.target.value as any })}
-            className="w-full px-4 py-2 rounded-lg border"
+            className={inputBorder()}
           >
             <option value="taller">Taller</option>
             <option value="xerrada">Xerrada</option>
@@ -128,15 +203,29 @@ export function WorkshopReviewForm() {
         <textarea
           required
           value={formData.content}
-          onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-          className="w-full px-4 py-2 rounded-lg border"
+          onChange={(e) => {
+            setFormData({ ...formData, content: e.target.value });
+            if (fieldErrors.content) setFieldErrors({ ...fieldErrors, content: undefined });
+          }}
+          className={inputBorder(!!fieldErrors.content)}
           rows={4}
           placeholder="Comparteix la teva experiència..."
           maxLength={2000}
         />
-        <p className="text-xs mt-1" style={{ color: "oklch(0.55 0.04 55)" }}>
-          {formData.content.length}/2000 caràcters
-        </p>
+        <div className="flex items-center justify-between mt-1">
+          {fieldErrors.content ? (
+            <p className="text-xs font-semibold" style={{ color: "oklch(0.55 0.18 25)" }}>
+              {fieldErrors.content}
+            </p>
+          ) : (
+            <p className="text-xs" style={{ color: "oklch(0.55 0.04 55)" }}>
+              Mínim 10 caràcters
+            </p>
+          )}
+          <p className="text-xs" style={{ color: "oklch(0.55 0.04 55)" }}>
+            {formData.content.length}/2000
+          </p>
+        </div>
       </div>
 
       <Button
