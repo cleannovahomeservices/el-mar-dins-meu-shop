@@ -34,12 +34,12 @@ import {
 function ProductionSummaryBlock({ orders }: { orders: Order[] }) {
   const [open, setOpen] = useState(false);
 
-  const PRODUCT_ORDER = ["Samarreta Noi", "Samarreta Noia", "Samarreta Tirants", "Samarreta Infantil"];
+  const PRODUCT_ORDER = ["Samarreta Ampla", "Samarreta Entallada", "Samarreta Tirants", "Samarreta Infantil"];
   const SIZE_ORDER: Record<string, string[]> = {
-    "Samarreta Noi":      ["S", "M", "L", "XL", "XXL", "3XL"],
-    "Samarreta Noia":     ["S", "M", "L", "XL", "2XL"],
-    "Samarreta Tirants":  ["S", "M", "L", "XL", "2XL"],
-    "Samarreta Infantil": ["3/4", "5/6", "7/8", "9/10", "11/12"],
+    "Samarreta Ampla":     ["S", "M", "L", "XL", "XXL", "3XL"],
+    "Samarreta Entallada": ["S", "M", "L", "XL", "2XL"],
+    "Samarreta Tirants":   ["S", "M", "L", "XL", "2XL"],
+    "Samarreta Infantil":  ["3/4", "5/6", "7/8", "9/10", "11/12"],
   };
 
   // Acumular totals
@@ -55,6 +55,13 @@ function ProductionSummaryBlock({ orders }: { orders: Order[] }) {
   const grandTotal = Object.values(totals).reduce(
     (sum, sizes) => sum + Object.values(sizes).reduce((s, n) => s + n, 0), 0
   );
+
+  // Mostrar primer els productes coneguts en ordre, i després qualsevol
+  // altre nom que aparegui a les comandes (perquè res quedi mai amagat).
+  const productsToShow = [
+    ...PRODUCT_ORDER.filter(p => totals[p]),
+    ...Object.keys(totals).filter(p => !PRODUCT_ORDER.includes(p)),
+  ];
 
   const handleExportCSV = () => {
     const rows: string[][] = [];
@@ -96,7 +103,7 @@ function ProductionSummaryBlock({ orders }: { orders: Order[] }) {
       `Total comandes: ${orders.length}`,
       "",
     ];
-    PRODUCT_ORDER.forEach(prod => {
+    productsToShow.forEach(prod => {
       const sizes = totals[prod];
       if (!sizes) return;
       const prodTotal = Object.values(sizes).reduce((s, n) => s + n, 0);
@@ -180,7 +187,7 @@ function ProductionSummaryBlock({ orders }: { orders: Order[] }) {
       {open && (
         <div className="px-5 pb-5 border-t" style={{ borderColor: "oklch(0.92 0.02 75)" }}>
           <div className="pt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {PRODUCT_ORDER.map(prod => {
+            {productsToShow.map(prod => {
               const sizes = totals[prod];
               if (!sizes) return null;
               const prodTotal = Object.values(sizes).reduce((s, n) => s + n, 0);
