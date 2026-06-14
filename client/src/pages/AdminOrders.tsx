@@ -40,6 +40,21 @@ function extractShippingAddress(notes: string | null): string | null {
   return match ? match[1].trim() : null;
 }
 
+// Determina on s'ha d'enviar/recollir una comanda, per agrupar-les en l'export d'enviaments.
+function getDeliveryDestination(order: Order): { destination: string; address: string } {
+  if (order.pickupPointName) {
+    return {
+      destination: `Recollida: ${order.pickupPointName}`,
+      address: `${order.pickupPointAddress ?? ""}, ${order.pickupPointPostalCode ?? ""} ${order.pickupPointCity ?? ""}`.trim(),
+    };
+  }
+  const shippingAddress = extractShippingAddress(order.notes);
+  if (shippingAddress) {
+    return { destination: "Enviament a domicili", address: shippingAddress };
+  }
+  return { destination: "Sense informació", address: "" };
+}
+
 // ── Component: Resum de producció per a la impremta ─────────────────
 function ProductionSummaryBlock({ orders }: { orders: Order[] }) {
   const [open, setOpen] = useState(false);
@@ -336,6 +351,66 @@ export default function AdminOrders() {
     }
   };
 
+  // Exporta un CSV organitzat per destinació: primer un resum amb el nombre
+  // de paquets per punt de recollida/adreça, i després el detall de cada comanda.
+  const handleExportShipping = () => {
+    if (!orders?.length) return;
+
+    const escape = (val: string | number | null | undefined): string => {
+      if (val === null || val === undefined) return "";
+      const str = String(val);
+      if (str.includes(",") || str.includes('"') || str.includes("\n")) return `"${str.replace(/"/g, '""')}"`;
+      return str;
+    };
+
+    const groups = new Map<string, { address: string; orders: Order[] }>();
+    (orders as Order[]).forEach(o => {
+      const { destination, address } = getDeliveryDestination(o);
+      if (!groups.has(destination)) groups.set(destination, { address, orders: [] });
+      groups.get(destination)!.orders.push(o);
+    });
+
+    // Punts de recollida primer (alfabètic), després domicili, i al final els que falten dades
+    const rank = (k: string) => (k === "Sense informació" ? 2 : k === "Enviament a domicili" ? 1 : 0);
+    const sortedKeys = Array.from(groups.keys()).sort((a, b) => {
+      const diff = rank(a) - rank(b);
+      return diff !== 0 ? diff : a.localeCompare(b, "ca");
+    });
+
+    const rows: (string | number)[][] = [];
+    rows.push(["RESUM D'ENVIAMENTS"]);
+    rows.push(["Destinació", "Adreça", "Nombre de paquets"]);
+    sortedKeys.forEach(key => {
+      const g = groups.get(key)!;
+      rows.push([key, g.address, g.orders.length]);
+    });
+    rows.push([]);
+    rows.push(["DETALL PER COMANDA"]);
+    rows.push(["Destinació", "Adreça", "ID", "Data", "Client", "Telèfon", "Productes", "Pagat", "Entregat"]);
+    sortedKeys.forEach(key => {
+      const g = groups.get(key)!;
+      g.orders.forEach(o => {
+        const items: OrderItem[] = JSON.parse(o.itemsJson || "[]");
+        const productsStr = items.map(i => `${i.name} T.${i.size} x${i.quantity}`).join(" | ");
+        const date = new Date(o.createdAt).toLocaleDateString("ca-ES", { day: "2-digit", month: "2-digit", year: "numeric" });
+        rows.push([key, g.address, o.id, date, o.customerName, o.customerPhone, productsStr, o.isPaid ? "Sí" : "No", o.isDelivered ? "Sí" : "No"]);
+      });
+    });
+
+    const csv = "﻿" + rows.map(r => r.map(escape).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const dateStr = new Date().toLocaleDateString("ca-ES", { day: "2-digit", month: "2-digit", year: "numeric" }).replace(/\//g, "-");
+    link.href = url;
+    link.download = `enviaments-${dateStr}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast.success(`Llistat d'enviaments exportat: ${(orders as Order[]).length} comandes`);
+  };
+
   const updateStatus = trpc.orders.updateStatus.useMutation({
     onSuccess: () => {
       refetch();
@@ -465,6 +540,15 @@ export default function AdminOrders() {
             >
               <FileDown size={14} />
               {isExporting ? "Exportant..." : "CSV"}
+            </button>
+            <button
+              onClick={handleExportShipping}
+              disabled={!orders?.length}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ fontFamily: "'Nunito', sans-serif" }}
+              title="Exportar llistat d'enviaments agrupat per punt de recollida o adreça"
+            >
+              <Truck size={14} /> Enviaments
             </button>
             <button
               onClick={() => refetch()}
