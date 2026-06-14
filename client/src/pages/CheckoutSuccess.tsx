@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams, useLocation } from "wouter";
 import { CheckCircle, Package, MapPin, Mail, Loader2 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
+import { useCart } from "@/contexts/CartContext";
 
 export default function CheckoutSuccess() {
   const [searchParams] = useSearchParams();
@@ -14,6 +15,7 @@ export default function CheckoutSuccess() {
   const sessionId = searchParams.get('session_id');
   const [orderData, setOrderData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const { clearCart } = useCart();
 
   useEffect(() => {
     if (!sessionId) {
@@ -21,8 +23,7 @@ export default function CheckoutSuccess() {
       return;
     }
 
-    // In a real app, you would fetch the order details from your backend
-    // For now, we'll just show a success message
+    clearCart();
     setLoading(false);
   }, [sessionId, navigate]);
 

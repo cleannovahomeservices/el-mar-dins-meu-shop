@@ -1,7 +1,7 @@
-import { eq, desc, isNull, isNotNull, sql } from "drizzle-orm";
+import { eq, desc, isNull, isNotNull, sql, getTableColumns } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
-import { InsertUser, InsertReview, InsertOrder, users, reviews, orders } from "../drizzle/schema";
+import { InsertUser, InsertReview, InsertOrder, users, reviews, orders, pickupPoints } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -196,7 +196,16 @@ export async function createOrder(data: InsertOrder) {
 export async function getAllOrders() {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(orders)
+  return db.select({
+    ...getTableColumns(orders),
+    pickupPointName: pickupPoints.name,
+    pickupPointAddress: pickupPoints.address,
+    pickupPointCity: pickupPoints.city,
+    pickupPointPostalCode: pickupPoints.postalCode,
+    pickupPointPhone: pickupPoints.phone,
+  })
+    .from(orders)
+    .leftJoin(pickupPoints, eq(orders.pickupPointId, pickupPoints.id))
     .where(isNull(orders.deletedAt))
     .orderBy(desc(orders.createdAt));
 }
@@ -238,7 +247,7 @@ export async function hardDeleteOrder(id: number) {
 
 // ── Punts de recollida ────────────────────────────────────────
 
-import { pickupPoints, workshopReviews, InsertWorkshopReview, InsertPickupPoint } from "../drizzle/schema";
+import { workshopReviews, InsertWorkshopReview, InsertPickupPoint } from "../drizzle/schema";
 
 export async function createPickupPoint(data: InsertPickupPoint) {
   const db = await getDb();

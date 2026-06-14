@@ -52,12 +52,7 @@ export default function CheckoutModal({ items, totalPrice, onClose }: Props) {
   const createCheckoutSessionMutation = trpc.checkout.createCheckoutSession.useMutation({
     onSuccess: (data) => {
       if (data.checkoutUrl) {
-        window.open(data.checkoutUrl, '_blank');
-        toast.success("Redirigint a Stripe per completar el pagament...");
-        setTimeout(() => {
-          clearCart();
-          onClose();
-        }, 1500);
+        window.location.href = data.checkoutUrl;
       }
     },
     onError: () => {
@@ -99,6 +94,7 @@ export default function CheckoutModal({ items, totalPrice, onClose }: Props) {
           price: i.price,
         })),
         pickupPointId: deliveryMethod === "pickup" ? selectedPickupPointId : undefined,
+        notes: fullNotes || undefined,
         origin: window.location.origin,
       });
     } else {
@@ -375,6 +371,9 @@ export default function CheckoutModal({ items, totalPrice, onClose }: Props) {
                         <div className="flex-1">
                           <div className="font-bold text-[oklch(0.3_0.06_50)] text-sm">{point.name}</div>
                           <div className="text-xs text-[oklch(0.55_0.04_55)]">{point.address}</div>
+                          {point.city && (
+                            <div className="text-xs font-semibold text-[oklch(0.45_0.07_200)]">{point.city}</div>
+                          )}
                         </div>
                         {selectedPickupPointId === point.id && (
                           <CheckCircle size={18} className="ml-auto flex-shrink-0 text-[oklch(0.55_0.1_200)]" />
@@ -431,7 +430,13 @@ export default function CheckoutModal({ items, totalPrice, onClose }: Props) {
               className="w-full btn-primary py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submitOrderMutation.isPending || createCheckoutSessionMutation.isPending ? (
-                <><div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> {paymentMethod === 'stripe' ? 'Redirigint...' : 'Enviant...'}</>
+                <div className="flex flex-col items-center gap-1">
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    {paymentMethod === 'stripe' ? 'Preparant Stripe...' : 'Enviant...'}
+                  </div>
+                  <span className="text-xs text-white/70">Pot trigar uns segons</span>
+                </div>
               ) : paymentMethod === 'stripe' ? (
                 <><CreditCard size={18} /> Anar a Stripe</>
               ) : (

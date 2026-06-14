@@ -4,7 +4,8 @@
   "outputDirectory": "dist/public",
   "functions": {
     "api/[...path].ts": {
-      "includeFiles": "dist/vercel-app.mjs"
+      "includeFiles": "dist/vercel-app.mjs",
+      "maxDuration": 30
     }
   },
   "rewrites": [

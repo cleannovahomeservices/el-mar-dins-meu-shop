@@ -319,6 +319,7 @@ export const appRouter = router({
         "Forma de pagament",
         "Pagat",
         "Entregat",
+        "Lliurament",
         "Notes client",
         "Notes internes",
         "Correu entrega enviat",
@@ -343,6 +344,10 @@ export const appRouter = router({
         notes: string | null;
         adminNotes: string | null;
         deliveryEmailSent: number;
+        pickupPointName: string | null;
+        pickupPointAddress: string | null;
+        pickupPointCity: string | null;
+        pickupPointPostalCode: string | null;
       }) => {
         const items = JSON.parse(o.itemsJson || "[]") as Array<{
           name: string;
@@ -357,6 +362,9 @@ export const appRouter = router({
           day: "2-digit", month: "2-digit", year: "numeric",
           hour: "2-digit", minute: "2-digit",
         });
+        const deliveryInfo = o.pickupPointName
+          ? `Recollida: ${o.pickupPointName} - ${o.pickupPointAddress ?? ""}, ${o.pickupPointPostalCode ?? ""} ${o.pickupPointCity ?? ""}`
+          : (o.notes?.match(/Enviament a domicili:.*/)?.[0] ?? "");
         return [
           escape(o.id),
           escape(date),
@@ -368,6 +376,7 @@ export const appRouter = router({
           escape(paymentLabels[o.paymentMethod] ?? o.paymentMethod),
           escape(o.isPaid ? "S\u00ed" : "No"),
           escape(o.isDelivered ? "S\u00ed" : "No"),
+          escape(deliveryInfo),
           escape(o.notes),
           escape(o.adminNotes),
           escape(o.deliveryEmailSent ? "S\u00ed" : "No"),

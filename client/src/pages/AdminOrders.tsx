@@ -28,7 +28,17 @@ import {
   Loader2,
   Printer,
   ChevronRight,
+  MapPin,
+  Truck,
 } from "lucide-react";
+
+// Extreu l'adreça d'enviament a domicili de les notes de la comanda
+// (es desa amb el format "Enviament a domicili: carrer, CP població").
+function extractShippingAddress(notes: string | null): string | null {
+  if (!notes) return null;
+  const match = notes.match(/Enviament a domicili:\s*(.+)/);
+  return match ? match[1].trim() : null;
+}
 
 // ── Component: Resum de producció per a la impremta ─────────────────
 function ProductionSummaryBlock({ orders }: { orders: Order[] }) {
@@ -266,6 +276,11 @@ interface Order {
   paymentReminderSentAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
+  pickupPointName?: string | null;
+  pickupPointAddress?: string | null;
+  pickupPointCity?: string | null;
+  pickupPointPostalCode?: string | null;
+  pickupPointPhone?: string | null;
 }
 
 export default function AdminOrders() {
@@ -562,7 +577,7 @@ export default function AdminOrders() {
                     transferencia: "Transferència",
                     "enmà": "En mà",
                   };
-                  const headers = ["ID", "Data", "Nom client", "Telèfon", "Email", "Productes", "Total (€)", "Forma de pagament", "Pagat", "Entregat", "Notes client", "Notes internes"];
+                  const headers = ["ID", "Data", "Nom client", "Telèfon", "Email", "Productes", "Total (€)", "Forma de pagament", "Pagat", "Entregat", "Lliurament", "Notes client", "Notes internes"];
                   const escape = (val: string | number | null | undefined): string => {
                     if (val === null || val === undefined) return "";
                     const str = String(val);
@@ -573,7 +588,10 @@ export default function AdminOrders() {
                     const items: OrderItem[] = JSON.parse(o.itemsJson || "[]");
                     const productsStr = items.map(i => `${i.name} T.${i.size} x${i.quantity}`).join(" | ");
                     const date = new Date(o.createdAt).toLocaleDateString("ca-ES", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
-                    return [escape(o.id), escape(date), escape(o.customerName), escape(o.customerPhone), escape(o.customerEmail), escape(productsStr), escape(o.totalPrice), escape(paymentLabels[o.paymentMethod] ?? o.paymentMethod), escape(o.isPaid ? "Sí" : "No"), escape(o.isDelivered ? "Sí" : "No"), escape(o.notes), escape(o.adminNotes)].join(",");
+                    const deliveryInfo = o.pickupPointName
+                      ? `Recollida: ${o.pickupPointName} - ${o.pickupPointAddress ?? ""}, ${o.pickupPointPostalCode ?? ""} ${o.pickupPointCity ?? ""}`
+                      : (extractShippingAddress(o.notes) ? `Enviament a domicili: ${extractShippingAddress(o.notes)}` : "");
+                    return [escape(o.id), escape(date), escape(o.customerName), escape(o.customerPhone), escape(o.customerEmail), escape(productsStr), escape(o.totalPrice), escape(paymentLabels[o.paymentMethod] ?? o.paymentMethod), escape(o.isPaid ? "Sí" : "No"), escape(o.isDelivered ? "Sí" : "No"), escape(deliveryInfo), escape(o.notes), escape(o.adminNotes)].join(",");
                   });
                   const csv = "\uFEFF" + [headers.join(","), ...rows].join("\n");
                   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -621,6 +639,7 @@ export default function AdminOrders() {
             {filtered.map((order: Order) => {
               const items: OrderItem[] = JSON.parse(order.itemsJson || "[]");
               const isExpanded = expandedId === order.id;
+              const shippingAddress = extractShippingAddress(order.notes);
 
               return (
                 <div key={order.id}
@@ -772,6 +791,32 @@ export default function AdminOrders() {
                       </button>
                     </div>
                   </div>
+
+                  {/* Informació de lliurament: punt de recollida o adreça d'enviament */}
+                  {(order.pickupPointName || shippingAddress) && (
+                    <div className="px-4 pb-3 -mt-1">
+                      <div className="flex items-start gap-2 px-3 py-2 rounded-xl text-xs"
+                        style={{ background: "oklch(0.95 0.04 75)", color: "oklch(0.4 0.05 55)", fontFamily: "'Nunito', sans-serif" }}>
+                        {order.pickupPointName ? (
+                          <>
+                            <MapPin size={14} className="mt-0.5 flex-shrink-0" style={{ color: "oklch(0.45 0.1 200)" }} />
+                            <span>
+                              <span className="font-bold">Recollida:</span> {order.pickupPointName}
+                              {order.pickupPointAddress && ` — ${order.pickupPointAddress}`}
+                              {order.pickupPointCity && `, ${order.pickupPointPostalCode ?? ""} ${order.pickupPointCity}`}
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <Truck size={14} className="mt-0.5 flex-shrink-0" style={{ color: "oklch(0.45 0.1 200)" }} />
+                            <span>
+                              <span className="font-bold">Enviament a domicili:</span> {shippingAddress}
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Detalls expandits */}
                   {isExpanded && (

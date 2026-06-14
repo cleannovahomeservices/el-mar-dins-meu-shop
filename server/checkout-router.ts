@@ -26,8 +26,9 @@ export const checkoutRouter = router({
             quantity: z.number().min(1),
             price: z.number().min(0),
           })
-        ),
+        ).min(1, "La cistella no pot estar buida"),
         pickupPointId: z.number().optional(),
+        notes: z.string().max(500).optional(),
         origin: z.string().url(),
       })
     )
@@ -50,6 +51,7 @@ export const checkoutRouter = router({
           customerName: input.customerName,
           customerEmail: input.customerEmail,
           customerPhone: input.customerPhone,
+          notes: input.notes ?? null,
           itemsJson,
           totalPrice: Math.round(totalPrice),
           pickupPointId: input.pickupPointId || undefined,

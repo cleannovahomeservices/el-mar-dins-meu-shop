@@ -4,6 +4,11 @@
    ============================================================= */
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { toast } from "sonner";
+
+// Mentre la botiga estigui tancada, no es permet afegir productes ni obrir la cistella.
+const SHOP_CLOSED = true;
+const SHOP_CLOSED_MESSAGE = "La botiga està tancada. Properament tornarem a obrir!";
 
 export interface CartItem {
   id: string;
@@ -87,6 +92,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [customerEmail]);
 
   const addItem = (newItem: Omit<CartItem, "quantity">) => {
+    if (SHOP_CLOSED) {
+      toast.error(SHOP_CLOSED_MESSAGE, { style: { fontFamily: "'Nunito', sans-serif" } });
+      return;
+    }
     setItems(prev => {
       const existing = prev.find(i => i.id === newItem.id && i.size === newItem.size);
       if (existing) {
@@ -126,7 +135,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
     <CartContext.Provider value={{
       items, addItem, removeItem, updateQuantity, clearCart,
       totalItems, totalPrice,
-      isOpen, openCart: () => setIsOpen(true), closeCart: () => setIsOpen(false),
+      isOpen,
+      openCart: () => {
+        if (SHOP_CLOSED) {
+          toast.error(SHOP_CLOSED_MESSAGE, { style: { fontFamily: "'Nunito', sans-serif" } });
+          return;
+        }
+        setIsOpen(true);
+      },
+      closeCart: () => setIsOpen(false),
       selectedPickupPointId, setSelectedPickupPointId,
       customerName, setCustomerName,
       customerEmail, setCustomerEmail
